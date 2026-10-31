@@ -1,5 +1,6 @@
 import type { UserProfile, CreateProfileInput } from "../types/profile";
 import type { AuthUser, AuthResponse } from "../types/auth";
+import type { CareerRole, RoleAnalysisResult } from "../types/role";
 
 const API_BASE_URL = "http://localhost:5000/api";
 
@@ -114,6 +115,37 @@ export async function saveMyProfile(token: string, profileData: Partial<CreatePr
   const result = await response.json();
   if (!response.ok) {
     throw new Error(result.message || result.error || "Failed to update profile");
+  }
+
+  return result.data;
+}
+
+// Fetch all career benchmark roles from MongoDB
+export async function fetchCareerRoles(): Promise<CareerRole[]> {
+  const response = await fetch(`${API_BASE_URL}/roles`);
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || `Failed to fetch career roles (${response.status})`);
+  }
+  const result = await response.json();
+  return result.data || [];
+}
+
+// Analyze user skills against a career role
+export async function analyzeSkillsAgainstRole(
+  roleTitle: string,
+  currentSkills: string[],
+  roleId?: string
+): Promise<RoleAnalysisResult> {
+  const response = await fetch(`${API_BASE_URL}/roles/analyze`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ roleTitle, currentSkills, roleId }),
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to analyze skills");
   }
 
   return result.data;

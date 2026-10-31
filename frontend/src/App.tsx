@@ -12,15 +12,19 @@ import {
   getStoredUser,
   clearStoredAuth,
   fetchMyProfile,
+  fetchCareerRoles,
+  saveMyProfile,
 } from "./services/api";
 import type { UserProfile } from "./types/profile";
 import type { AuthUser } from "./types/auth";
+import type { CareerRole } from "./types/role";
 import "./App.css";
 
 function App() {
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(getStoredUser());
   const [token, setToken] = useState<string | null>(getStoredToken());
   const [myProfile, setMyProfile] = useState<UserProfile | null>(null);
+  const [roles, setRoles] = useState<CareerRole[]>([]);
   const [loadingProfile, setLoadingProfile] = useState<boolean>(false);
   const [backendOnline, setBackendOnline] = useState<boolean | null>(null);
 
@@ -35,6 +39,16 @@ function App() {
   const loadHealth = useCallback(async () => {
     const health = await checkBackendHealth();
     setBackendOnline(health.isOnline);
+  }, []);
+
+  // Fetch benchmark roles from MongoDB
+  const loadRoles = useCallback(async () => {
+    try {
+      const data = await fetchCareerRoles();
+      setRoles(data);
+    } catch (err) {
+      console.error("Failed to load career roles:", err);
+    }
   }, []);
 
   // Fetch logged in user's profile
@@ -56,8 +70,9 @@ function App() {
 
   useEffect(() => {
     loadHealth();
+    loadRoles();
     loadProfile();
-  }, [loadHealth, loadProfile]);
+  }, [loadHealth, loadRoles, loadProfile]);
 
   const handleOpenAuth = (mode: "login" | "register") => {
     setAuthModalMode(mode);
@@ -80,7 +95,18 @@ function App() {
 
   const handleProfileSaved = (saved: UserProfile) => {
     setMyProfile(saved);
-    setActiveTab("overview"); // Switch back to overview tab on successful save
+    setActiveTab("overview");
+  };
+
+  // Switch target role directly from SkillGapTab or Explorer modal
+  const handleUpdateTargetRole = async (newRoleTitle: string) => {
+    if (!token) return;
+    try {
+      const updated = await saveMyProfile(token, { targetRole: newRoleTitle });
+      setMyProfile(updated);
+    } catch (err) {
+      console.error("Failed to update target role:", err);
+    }
   };
 
   return (
@@ -123,12 +149,15 @@ function App() {
               ) : activeTab === "gap" ? (
                 <SkillGapTab
                   profile={myProfile}
+                  roles={roles}
                   onGoToEdit={() => setActiveTab("edit")}
+                  onUpdateTargetRole={handleUpdateTargetRole}
                 />
               ) : (
                 <EditProfileView
                   token={token}
                   initialProfile={myProfile}
+                  roles={roles}
                   defaultName={currentUser.name}
                   onProfileSaved={handleProfileSaved}
                   onCancel={() => setActiveTab("overview")}

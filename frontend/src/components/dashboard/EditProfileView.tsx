@@ -1,25 +1,18 @@
 import { useState, useEffect } from "react";
 import type { UserProfile, CreateProfileInput } from "../../types/profile";
+import type { CareerRole } from "../../types/role";
 import { saveMyProfile } from "../../services/api";
 
 interface EditProfileViewProps {
   token: string | null;
   initialProfile: UserProfile | null;
+  roles?: CareerRole[];
   defaultName: string;
   onProfileSaved: (savedProfile: UserProfile) => void;
   onCancel: () => void;
 }
 
-const COMMON_ROLES = [
-  "Full Stack Developer",
-  "Frontend Developer",
-  "Backend Developer",
-  "Data Scientist",
-  "DevOps Engineer",
-  "AI/ML Engineer",
-];
-
-const SUGGESTED_SKILLS = [
+const DEFAULT_SUGGESTED_SKILLS = [
   "JavaScript",
   "TypeScript",
   "React",
@@ -34,11 +27,14 @@ const SUGGESTED_SKILLS = [
   "Docker",
   "Java",
   "AWS",
+  "Linux",
+  "Machine Learning",
 ];
 
 export default function EditProfileView({
   token,
   initialProfile,
+  roles = [],
   defaultName,
   onProfileSaved,
   onCancel,
@@ -77,10 +73,15 @@ export default function EditProfileView({
     }
   }, [initialProfile]);
 
+  // Find matching role in library
+  const matchedBenchmarkRole = roles.find(
+    (r) => r.title.toLowerCase() === targetRole.trim().toLowerCase()
+  );
+
   const handleAddSkill = (skillToAdd: string) => {
     const trimmed = skillToAdd.trim();
     if (!trimmed) return;
-    if (!skills.includes(trimmed)) {
+    if (!skills.some((s) => s.toLowerCase() === trimmed.toLowerCase())) {
       setSkills((prev) => [...prev, trimmed]);
     }
     setSkillInput("");
@@ -88,6 +89,21 @@ export default function EditProfileView({
 
   const handleRemoveSkill = (skillToRemove: string) => {
     setSkills((prev) => prev.filter((s) => s !== skillToRemove));
+  };
+
+  const handleAddAllCoreSkills = () => {
+    if (!matchedBenchmarkRole) return;
+    setSkills((prev) => {
+      const existingLower = new Set(prev.map((s) => s.toLowerCase()));
+      const newSkills = [...prev];
+      matchedBenchmarkRole.coreSkills.forEach((s) => {
+        if (!existingLower.has(s.toLowerCase())) {
+          newSkills.push(s);
+          existingLower.add(s.toLowerCase());
+        }
+      });
+      return newSkills;
+    });
   };
 
   const handleKeyDownSkill = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -137,13 +153,27 @@ export default function EditProfileView({
     }
   };
 
+  const roleListToDisplay =
+    roles.length > 0
+      ? roles.map((r) => r.title)
+      : [
+          "Full Stack Developer",
+          "Frontend Developer",
+          "Backend Developer",
+          "Data Scientist",
+          "DevOps & Cloud Engineer",
+          "AI / ML Engineer",
+          "Cybersecurity Analyst",
+          "Mobile App Developer",
+        ];
+
   return (
     <div className="edit-profile-container">
       <div className="edit-view-header">
         <div>
           <h2>Profile &amp; Career Settings</h2>
           <p className="edit-view-subtitle">
-            Update your career goals, education history, and current skill set
+            Configure your target dream role and add your current skills arsenal
           </p>
         </div>
         <button type="button" className="btn btn-secondary btn-sm" onClick={onCancel}>
@@ -172,7 +202,7 @@ export default function EditProfileView({
             <span className="section-number">1</span>
             <div>
               <h3>Target Career Direction</h3>
-              <p className="section-subtext">The job role you want to assess yourself against</p>
+              <p className="section-subtext">The industry role you want to assess yourself against</p>
             </div>
           </div>
 
@@ -191,8 +221,8 @@ export default function EditProfileView({
             />
 
             <div className="quick-suggestions">
-              <span className="suggestions-label">Suggestions:</span>
-              {COMMON_ROLES.map((role) => (
+              <span className="suggestions-label">MongoDB Roles:</span>
+              {roleListToDisplay.map((role) => (
                 <button
                   key={role}
                   type="button"
@@ -203,6 +233,27 @@ export default function EditProfileView({
                 </button>
               ))}
             </div>
+
+            {matchedBenchmarkRole && (
+              <div className="role-benchmark-hint-box">
+                <div className="benchmark-hint-content">
+                  <strong>📚 Benchmark Found in MongoDB:</strong>
+                  <span>
+                    {" "}
+                    {matchedBenchmarkRole.category} &bull; {matchedBenchmarkRole.coreSkills.length}{" "}
+                    core skills required &bull; {matchedBenchmarkRole.demandLevel} demand.
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={handleAddAllCoreSkills}
+                  title="Auto-fill your skills with the core skills required for this role"
+                >
+                  + Add All Core Skills
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="form-group">
@@ -237,7 +288,7 @@ export default function EditProfileView({
 
           <div className="form-group">
             <label htmlFor="skill-input">
-              Add a Skill <span className="helper-text">(Press Enter or click Add)</span>
+              Add a Skill <span className="helper-text">(Press Enter or click + Add)</span>
             </label>
             <div className="skill-input-row">
               <input
@@ -260,8 +311,10 @@ export default function EditProfileView({
 
             <div className="quick-suggestions">
               <span className="suggestions-label">Popular Skills:</span>
-              {SUGGESTED_SKILLS.map((skill) => {
-                const isSelected = skills.includes(skill);
+              {DEFAULT_SUGGESTED_SKILLS.map((skill) => {
+                const isSelected = skills.some(
+                  (s) => s.toLowerCase() === skill.toLowerCase()
+                );
                 return (
                   <button
                     key={skill}
