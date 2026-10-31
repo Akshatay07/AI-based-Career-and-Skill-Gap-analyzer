@@ -2015,3 +2015,551 @@ select.form-control {
   padding: 40px;
   color: var(--text-muted);
 }
+
+/* ==========================================================================
+   AI ROADMAP (GOOGLE GEMINI 3.8 FLASH) STYLING
+   ========================================================================== */
+
+.ai-roadmap-tab-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Banner Card */
+.roadmap-banner-card {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 50%, rgba(236, 72, 153, 0.08) 100%);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.roadmap-banner-left {
+  flex: 1;
+  min-width: 280px;
+}
+
+.ai-model-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  color: #c7d2fe;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  margin-bottom: 8px;
+}
+
+.ai-sparkle-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #a855f7;
+  box-shadow: 0 0 8px #c084fc;
+  animation: pulse 1.8s infinite;
+}
+
+.ai-pulse-pill {
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  color: #ffffff;
+  font-size: 9.5px;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
+}
+
+.roadmap-title {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.roadmap-sub {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+}
+
+.btn-regenerate {
+  padding: 11px 22px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.spinner-inline {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+
+/* Empty & Generating States */
+.empty-roadmap-card {
+  text-align: center;
+  padding: 60px 20px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.empty-roadmap-icon,
+.ai-ready-illustration {
+  font-size: 52px;
+  margin-bottom: 12px;
+}
+
+.ai-generating-card {
+  text-align: center;
+  padding: 60px 20px;
+  background: rgba(17, 23, 38, 0.9);
+  border: 1px dashed rgba(99, 102, 241, 0.5);
+}
+
+.ai-pulse-orb {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent-gradient);
+  margin: 0 auto 20px;
+  box-shadow: 0 0 25px rgba(99, 102, 241, 0.6);
+  animation: pulse 1.5s infinite;
+}
+
+/* Roadmap Content Layout */
+.roadmap-content-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* Executive Summary Card */
+.executive-summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-color: rgba(99, 102, 241, 0.25);
+}
+
+.summary-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.assessment-badge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #6ee7b7;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.ai-overview-text {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #e2e8f0;
+  font-style: italic;
+  border-left: 3px solid var(--accent-primary);
+  padding-left: 16px;
+}
+
+.roadmap-progress-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(10, 13, 20, 0.5);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+}
+
+.progress-track-lg {
+  height: 10px;
+}
+
+/* Section Title Headers */
+.section-title-wrap {
+  margin-bottom: 14px;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+/* Timeline Phases */
+.phases-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.phase-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  border-left: 4px solid var(--accent-primary);
+  transition: all 0.2s ease;
+}
+
+.phase-card.phase-all-done {
+  border-left-color: var(--success);
+  background: rgba(16, 185, 129, 0.04);
+}
+
+.phase-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 14px;
+}
+
+.phase-title-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.phase-number-badge {
+  background: var(--accent-gradient);
+  color: #ffffff;
+  font-size: 11.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.phase-heading {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.phase-duration-text {
+  font-size: 12.5px;
+  color: #a5b4fc;
+  font-weight: 600;
+}
+
+.phase-focus-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.focus-skill-tag {
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #c7d2fe;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+/* Action Items Checklist */
+.action-items-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.subsection-kicker {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.action-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.action-item-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(10, 13, 20, 0.5);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.action-item-row:hover {
+  border-color: var(--border-hover);
+  background: rgba(99, 102, 241, 0.06);
+}
+
+.action-item-row.task-completed {
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.action-item-row.task-completed .task-text {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.action-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #10b981;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.task-text {
+  font-size: 13.5px;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.task-done-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.15);
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+}
+
+/* Curated Resources */
+.phase-resources-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 14px;
+}
+
+.resources-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+}
+
+.resource-item-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.resource-type-tag {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #a5b4fc;
+}
+
+.resource-name {
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.resource-platform {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+/* Recommended Capstone Projects */
+.projects-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 860px) {
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.project-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-top: 3px solid #ec4899;
+}
+
+.project-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.project-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.difficulty-badge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.diff-beginner {
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+}
+
+.diff-intermediate {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+}
+
+.diff-advanced {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+}
+
+.project-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.project-skills-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.project-skills-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.project-skills-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.project-arch-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 10px;
+}
+
+.arch-bullets {
+  padding-left: 18px;
+  font-size: 12.5px;
+  color: #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Interview Focus Areas */
+.interview-focus-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.interview-header-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.interview-icon {
+  font-size: 32px;
+}
+
+.interview-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.interview-sub {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.interview-bullets-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .interview-bullets-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.interview-bullet-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+}
+
+.bullet-number {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent-gradient);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.bullet-text {
+  font-size: 13px;
+  color: #e2e8f0;
+  line-height: 1.5;
+}
+
+.active-ai-card .ai-cta-action {
+  margin-top: 12px;
+}

@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 import profileRoutes from "./routes/profileRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import roleRoutes from "./routes/roleRoutes.js";
+import roadmapRoutes from "./routes/roadmapRoutes.js";
 import { seedCareerRolesIfEmpty } from "./data/seedDatabase.js";
 
 dotenv.config();
@@ -35,6 +36,7 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/profiles", profileRoutes);
 app.use("/api/roles", roleRoutes);
+app.use("/api/ai/roadmap", roadmapRoutes);
 
 async function startServer() {
   try {

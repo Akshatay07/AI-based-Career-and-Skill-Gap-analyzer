@@ -4,8 +4,8 @@ import type { UserProfile } from "../../types/profile";
 interface DashboardHeaderProps {
   user: AuthUser;
   profile: UserProfile | null;
-  activeTab: "overview" | "edit" | "gap";
-  onTabChange: (tab: "overview" | "edit" | "gap") => void;
+  activeTab: "overview" | "gap" | "roadmap" | "edit";
+  onTabChange: (tab: "overview" | "gap" | "roadmap" | "edit") => void;
 }
 
 export default function DashboardHeader({
@@ -113,7 +113,16 @@ export default function DashboardHeader({
         >
           <span className="tab-icon">🎯</span>
           <span>Skill Gap Analyzer</span>
-          <span className="tab-pill">Feature 2</span>
+        </button>
+
+        <button
+          type="button"
+          className={`nav-tab-item ${activeTab === "roadmap" ? "active" : ""}`}
+          onClick={() => onTabChange("roadmap")}
+        >
+          <span className="tab-icon">🤖</span>
+          <span>AI Roadmap</span>
+          <span className="tab-pill ai-pulse-pill">Gemini 3.8</span>
         </button>
 
         <button

@@ -6,6 +6,7 @@ import DashboardHeader from "./components/dashboard/DashboardHeader";
 import DashboardOverview from "./components/dashboard/DashboardOverview";
 import EditProfileView from "./components/dashboard/EditProfileView";
 import SkillGapTab from "./components/dashboard/SkillGapTab";
+import AiRoadmapTab from "./components/dashboard/AiRoadmapTab";
 import {
   checkBackendHealth,
   getStoredToken,
@@ -14,10 +15,12 @@ import {
   fetchMyProfile,
   fetchCareerRoles,
   saveMyProfile,
+  fetchMyRoadmap,
 } from "./services/api";
 import type { UserProfile } from "./types/profile";
 import type { AuthUser } from "./types/auth";
 import type { CareerRole } from "./types/role";
+import type { Roadmap } from "./types/roadmap";
 import "./App.css";
 
 function App() {
@@ -25,11 +28,12 @@ function App() {
   const [token, setToken] = useState<string | null>(getStoredToken());
   const [myProfile, setMyProfile] = useState<UserProfile | null>(null);
   const [roles, setRoles] = useState<CareerRole[]>([]);
+  const [roadmap, setRoadmap] = useState<Roadmap | null>(null);
   const [loadingProfile, setLoadingProfile] = useState<boolean>(false);
   const [backendOnline, setBackendOnline] = useState<boolean | null>(null);
 
-  // Active Tab state for Dashboard ('overview' | 'gap' | 'edit')
-  const [activeTab, setActiveTab] = useState<"overview" | "gap" | "edit">("overview");
+  // Active Tab state for Dashboard ('overview' | 'gap' | 'roadmap' | 'edit')
+  const [activeTab, setActiveTab] = useState<"overview" | "gap" | "roadmap" | "edit">("overview");
 
   // Auth Modal State
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
@@ -51,18 +55,23 @@ function App() {
     }
   }, []);
 
-  // Fetch logged in user's profile
-  const loadProfile = useCallback(async () => {
+  // Fetch logged in user's profile and existing AI roadmap
+  const loadUserData = useCallback(async () => {
     if (!token) {
       setMyProfile(null);
+      setRoadmap(null);
       return;
     }
     setLoadingProfile(true);
     try {
-      const data = await fetchMyProfile(token);
-      setMyProfile(data);
+      const profileData = await fetchMyProfile(token);
+      setMyProfile(profileData);
+
+      // Fetch saved AI roadmap if available
+      const roadmapData = await fetchMyRoadmap(token);
+      setRoadmap(roadmapData);
     } catch (err) {
-      console.error("Failed to load profile:", err);
+      console.error("Failed to load user data:", err);
     } finally {
       setLoadingProfile(false);
     }
@@ -71,8 +80,8 @@ function App() {
   useEffect(() => {
     loadHealth();
     loadRoles();
-    loadProfile();
-  }, [loadHealth, loadRoles, loadProfile]);
+    loadUserData();
+  }, [loadHealth, loadRoles, loadUserData]);
 
   const handleOpenAuth = (mode: "login" | "register") => {
     setAuthModalMode(mode);
@@ -90,6 +99,7 @@ function App() {
     setCurrentUser(null);
     setToken(null);
     setMyProfile(null);
+    setRoadmap(null);
     setActiveTab("overview");
   };
 
@@ -152,6 +162,15 @@ function App() {
                   roles={roles}
                   onGoToEdit={() => setActiveTab("edit")}
                   onUpdateTargetRole={handleUpdateTargetRole}
+                  onGoToRoadmap={() => setActiveTab("roadmap")}
+                />
+              ) : activeTab === "roadmap" ? (
+                <AiRoadmapTab
+                  token={token}
+                  profile={myProfile}
+                  roadmap={roadmap}
+                  onRoadmapUpdated={setRoadmap}
+                  onGoToEdit={() => setActiveTab("edit")}
                 />
               ) : (
                 <EditProfileView

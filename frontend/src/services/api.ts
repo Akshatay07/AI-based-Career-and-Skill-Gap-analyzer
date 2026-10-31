@@ -1,6 +1,7 @@
 import type { UserProfile, CreateProfileInput } from "../types/profile";
 import type { AuthUser, AuthResponse } from "../types/auth";
 import type { CareerRole, RoleAnalysisResult } from "../types/role";
+import type { Roadmap } from "../types/roadmap";
 
 const API_BASE_URL = "http://localhost:5000/api";
 
@@ -146,6 +147,65 @@ export async function analyzeSkillsAgainstRole(
   const result = await response.json();
   if (!response.ok) {
     throw new Error(result.message || "Failed to analyze skills");
+  }
+
+  return result.data;
+}
+
+// Generate or Regenerate Personalized AI Roadmap via Gemini
+export async function generateAiRoadmap(token: string): Promise<Roadmap> {
+  const response = await fetch(`${API_BASE_URL}/ai/roadmap`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to generate AI roadmap");
+  }
+
+  return result.data;
+}
+
+// Fetch Logged-in User's Saved Roadmap from MongoDB
+export async function fetchMyRoadmap(token: string): Promise<Roadmap | null> {
+  const response = await fetch(`${API_BASE_URL}/ai/roadmap`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || "Failed to fetch roadmap");
+  }
+
+  const result = await response.json();
+  return result.data || null;
+}
+
+// Toggle an action item's completed status in MongoDB
+export async function toggleRoadmapTask(
+  token: string,
+  phaseNumber: number,
+  taskIndex: number,
+  isCompleted: boolean
+): Promise<Roadmap> {
+  const response = await fetch(`${API_BASE_URL}/ai/roadmap/task`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ phaseNumber, taskIndex, isCompleted }),
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to update task status");
   }
 
   return result.data;

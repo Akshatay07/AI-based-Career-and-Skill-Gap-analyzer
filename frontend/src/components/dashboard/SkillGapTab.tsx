@@ -9,6 +9,7 @@ interface SkillGapTabProps {
   roles: CareerRole[];
   onGoToEdit: () => void;
   onUpdateTargetRole: (newRoleTitle: string) => void;
+  onGoToRoadmap: () => void;
 }
 
 export default function SkillGapTab({
@@ -16,6 +17,7 @@ export default function SkillGapTab({
   roles,
   onGoToEdit,
   onUpdateTargetRole,
+  onGoToRoadmap,
 }: SkillGapTabProps) {
   const targetRole = profile?.targetRole;
   const userSkills = profile?.currentSkills || [];
@@ -285,18 +287,27 @@ export default function SkillGapTab({
         </div>
       )}
 
-      {/* Feature 2 Sneak Peek / Gemini AI Learning Roadmap */}
-      <div className="card ai-teaser-card">
-        <div className="ai-teaser-badge">Next Step: Feature 2</div>
+      {/* Gemini AI Learning Roadmap Action Card */}
+      <div className="card ai-teaser-card active-ai-card">
+        <div className="ai-teaser-badge">Powered by Gemini 3.8 Flash</div>
         <div className="ai-teaser-body">
           <div className="ai-teaser-icon">🤖</div>
           <div className="ai-teaser-text">
-            <h3>Generate AI Learning Roadmap (Google Gemini)</h3>
+            <h3>Generate Personalized AI Learning Roadmap</h3>
             <p>
-              Ready to close the gap? Our upcoming Google Gemini integration will analyze your{" "}
+              Ready to close the gap? Google Gemini will analyze your{" "}
               <strong>{analysis?.breakdown.core.missingCount || 0} critical skill gaps</strong> and
-              build a personalized week-by-week learning roadmap and portfolio projects for you!
+              build a step-by-step weekly roadmap, interactive checklist, and portfolio project suggestions for you!
             </p>
+            <div className="ai-cta-action">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={onGoToRoadmap}
+              >
+                🚀 Open AI Learning Roadmap
+              </button>
+            </div>
           </div>
         </div>
       </div>
