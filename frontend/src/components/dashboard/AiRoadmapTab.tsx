@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Roadmap } from "../../types/roadmap";
 import type { UserProfile } from "../../types/profile";
 import { generateAiRoadmap, toggleRoadmapTask } from "../../services/api";
@@ -11,6 +11,29 @@ interface AiRoadmapTabProps {
   onGoToEdit: () => void;
 }
 
+const GENERATION_STAGES = [
+  {
+    title: "Auditing Skill Gaps",
+    desc: "Comparing your current profile against role requirements...",
+    icon: "🔍",
+  },
+  {
+    title: "Structuring Milestone Timeline",
+    desc: "Sequencing core technical phases and curated tutorials...",
+    icon: "⏱️",
+  },
+  {
+    title: "Synthesizing Portfolio Projects",
+    desc: "Designing resume-worthy capstones and interview focus topics...",
+    icon: "🚀",
+  },
+  {
+    title: "Finalizing Roadmap",
+    desc: "Formatting learning checklist and action tasks...",
+    icon: "✨",
+  },
+];
+
 export default function AiRoadmapTab({
   token,
   profile,
@@ -19,8 +42,37 @@ export default function AiRoadmapTab({
   onGoToEdit,
 }: AiRoadmapTabProps) {
   const [generating, setGenerating] = useState(false);
+  const [currentStageIndex, setCurrentStageIndex] = useState(0);
+  const [secondsElapsed, setSecondsElapsed] = useState(0);
   const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
+
+  // Manage timer and stages during AI roadmap generation
+  useEffect(() => {
+    let timer: number | undefined;
+    if (generating) {
+      setSecondsElapsed(0);
+      setCurrentStageIndex(0);
+
+      timer = window.setInterval(() => {
+        setSecondsElapsed((prev) => {
+          const next = prev + 1;
+          if (next >= 6) {
+            setCurrentStageIndex(3);
+          } else if (next >= 4) {
+            setCurrentStageIndex(2);
+          } else if (next >= 2) {
+            setCurrentStageIndex(1);
+          }
+          return next;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [generating]);
 
   const handleGenerate = async () => {
     if (!token) return;
@@ -94,7 +146,7 @@ export default function AiRoadmapTab({
         <div className="roadmap-banner-left">
           <div className="ai-model-tag">
             <span className="ai-sparkle-dot"></span>
-            <span>Powered by Google Gemini 3.8 Flash</span>
+            <span>Powered by Google Gemini Flash AI</span>
           </div>
 
           <h2 className="roadmap-title">
@@ -117,7 +169,7 @@ export default function AiRoadmapTab({
             {generating ? (
               <>
                 <span className="spinner-inline"></span>
-                <span>Gemini is Architecting...</span>
+                <span>Gemini is Architecting... ({secondsElapsed}s)</span>
               </>
             ) : roadmap ? (
               "🔄 Regenerate with AI"
@@ -141,7 +193,7 @@ export default function AiRoadmapTab({
           <div className="ai-ready-illustration">✨</div>
           <h3>Ready to Bridge Your Skill Gaps with Gemini AI</h3>
           <p className="empty-sub">
-            Click <strong>"Generate AI Roadmap"</strong> above. Google Gemini will inspect your{" "}
+            Click <strong>"Generate AI Roadmap"</strong> above. Google Gemini Flash AI will inspect your{" "}
             <strong>{profile.currentSkills.length} current skills</strong> and build a step-by-step
             learning schedule to master the missing requirements for <strong>{profile.targetRole}</strong>.
           </p>
@@ -155,12 +207,43 @@ export default function AiRoadmapTab({
         </div>
       )}
 
-      {/* Generating Skeleton / Loading State */}
+      {/* Generating Stepped Loading State */}
       {generating && (
         <div className="card ai-generating-card">
           <div className="ai-pulse-orb"></div>
-          <h3>Consulting Google Gemini 3.8 Flash</h3>
-          <p>Analyzing technical gaps, selecting curated learning resources, and drafting portfolio projects...</p>
+          <h3 className="ai-generating-title">Consulting Google Gemini Flash AI</h3>
+          <p className="ai-generating-sub">
+            Architecting your personalized curriculum in real-time (~3-5s response)
+          </p>
+
+          {/* Stepped progress indicators */}
+          <div className="generation-steps-grid">
+            {GENERATION_STAGES.map((stage, idx) => {
+              const isPast = idx < currentStageIndex;
+              const isCurrent = idx === currentStageIndex;
+
+              return (
+                <div
+                  key={stage.title}
+                  className={`generation-step-item ${isPast ? "step-past" : ""} ${isCurrent ? "step-active" : ""}`}
+                >
+                  <div className="step-item-header">
+                    <span className="step-icon">{stage.icon}</span>
+                    <span className="step-item-title">{stage.title}</span>
+                    {isPast && <span className="step-badge-done">✓</span>}
+                    {isCurrent && <span className="step-badge-running">Processing...</span>}
+                  </div>
+                  <p className="step-item-desc">{stage.desc}</p>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="generation-timer-pill">
+            <span>⏱️ Elapsed: {secondsElapsed}s</span>
+            <span className="timer-separator">•</span>
+            <span>Ultra-fast Flash inference</span>
+          </div>
         </div>
       )}
 
@@ -355,3 +438,4 @@ export default function AiRoadmapTab({
     </div>
   );
 }
+

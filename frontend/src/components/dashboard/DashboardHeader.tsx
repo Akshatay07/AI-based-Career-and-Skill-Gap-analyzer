@@ -122,7 +122,7 @@ export default function DashboardHeader({
         >
           <span className="tab-icon">🤖</span>
           <span>AI Roadmap</span>
-          <span className="tab-pill ai-pulse-pill">Gemini 3.8</span>
+          <span className="tab-pill ai-pulse-pill">Gemini AI</span>
         </button>
 
         <button

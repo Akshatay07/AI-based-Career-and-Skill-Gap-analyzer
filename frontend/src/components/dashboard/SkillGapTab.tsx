@@ -289,7 +289,7 @@ export default function SkillGapTab({
 
       {/* Gemini AI Learning Roadmap Action Card */}
       <div className="card ai-teaser-card active-ai-card">
-        <div className="ai-teaser-badge">Powered by Gemini 3.8 Flash</div>
+        <div className="ai-teaser-badge">Powered by Google Gemini Flash AI</div>
         <div className="ai-teaser-body">
           <div className="ai-teaser-icon">🤖</div>
           <div className="ai-teaser-text">
