@@ -9,6 +9,13 @@ function getGeminiClient() {
   return new GoogleGenAI({ apiKey });
 }
 
+// Timeout helper to ensure API calls never hang indefinitely
+function timeoutPromise(ms, message = "Operation timed out") {
+  return new Promise((_, reject) => {
+    setTimeout(() => reject(new Error(message)), ms);
+  });
+}
+
 export async function generateCareerRoadmap({
   userName,
   targetRole,
@@ -19,77 +26,98 @@ export async function generateCareerRoadmap({
   missingOptionalSkills,
 }) {
   const allMissing = [...missingCoreSkills, ...missingOptionalSkills];
-  const missingString = allMissing.length > 0 ? allMissing.join(", ") : "Advanced Best Practices";
   const currentSkillsString = currentSkills.length > 0 ? currentSkills.join(", ") : "Foundational programming basics";
 
-  const prompt = `You are a Senior Technical Career Architect and Lead Engineering Mentor.
-Create a structured, personalized learning roadmap and actionable project guide for a candidate aspiring to become a "${targetRole}".
+  const prompt = `You are a Senior Technical Career Architect.
+Create a concise, high-impact learning roadmap for a candidate aiming to become a "${targetRole}".
 
-Candidate Context:
-- Name: ${userName || "Student / Candidate"}
-- Experience Level: ${experienceLevel || "Fresher/Student"}
-- Education: ${education?.degree ? `${education.degree} in ${education.fieldOfStudy || "Engineering/CS"}` : "Undergraduate"}
-- Current Skills Already Acquired: ${currentSkillsString}
-- Core Skills Missing (Critical Gaps): ${missingCoreSkills.join(", ") || "None"}
-- Bonus / Optional Skills Missing: ${missingOptionalSkills.join(", ") || "None"}
+Candidate Profile:
+- Candidate: ${userName || "Candidate"} (${experienceLevel || "Fresher/Student"})
+- Current Acquired Skills: ${currentSkillsString}
+- Critical Missing Gaps: ${missingCoreSkills.join(", ") || "Foundational concepts"}
+- Optional/Bonus Gaps: ${missingOptionalSkills.join(", ") || "None"}
 
-Requirements:
-1. Provide an executive career transition summary explaining how close they are to job-readiness and what the primary focus should be.
-2. Build 3 to 4 chronological learning phases (e.g., Phase 1: Core Fundamentals, Phase 2: System Implementation, Phase 3: Production & Tooling).
-3. For each phase, provide 3 to 4 actionable, concrete tasks (e.g., "Build a REST API with JWT auth and rate limiting", "Set up Docker multi-stage build"), and 2 to 3 free resources (official docs, YouTube channels, tutorials).
-4. Provide 2 to 3 portfolio project ideas designed specifically to showcase the missing skills to hiring managers, with key architecture highlights.
-5. Provide 4 to 5 key technical interview focus areas for this role.
-
-Respond ONLY with valid JSON strictly adhering to this schema:
+Generate ONLY a JSON object adhering strictly to this schema:
 {
-  "overview": "string",
+  "overview": "Concise 2-3 sentence career transition summary and readiness assessment",
   "timelinePhases": [
     {
       "phaseNumber": 1,
-      "title": "string",
+      "title": "Phase title",
       "duration": "e.g. Weeks 1 - 2",
-      "focusSkills": ["string"],
+      "focusSkills": ["Skill 1", "Skill 2"],
       "actionItems": [
-        { "task": "string" }
+        { "task": "Concise, actionable task description" },
+        { "task": "Concise, actionable task description" }
       ],
       "resources": [
-        { "title": "string", "type": "Documentation | Video Course | Tutorial", "urlOrPlatform": "string" }
+        { "title": "Resource Name", "type": "Documentation | Video Course | Tutorial", "urlOrPlatform": "Platform name" }
       ]
     }
   ],
   "recommendedProjects": [
     {
-      "title": "string",
+      "title": "Project Name",
       "difficulty": "Beginner | Intermediate | Advanced",
-      "description": "string",
-      "demonstratesSkills": ["string"],
-      "architectureHighlights": ["string"]
+      "description": "Concise 1-2 sentence project overview",
+      "demonstratesSkills": ["Skill 1", "Skill 2"],
+      "architectureHighlights": ["Highlight 1", "Highlight 2"]
     }
   ],
-  "interviewFocusAreas": ["string"]
-}`;
+  "interviewFocusAreas": ["Topic 1", "Topic 2", "Topic 3"]
+}
 
-  try {
-    const ai = getGeminiClient();
-    const response = await ai.models.generateContent({
-      model: "gemini-3.8-flash",
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-      },
-    });
+Guidelines:
+- Return exactly 3 chronological phases.
+- Return 2 to 3 action items per phase.
+- Return 1 to 2 curated free learning resources per phase.
+- Return exactly 2 resume-worthy capstone projects.
+- Return exactly 3 technical interview focus topics.
+- Keep output concise, professional, and directly tailored to the missing skills.`;
 
-    const parsedData = JSON.parse(response.text);
-    return parsedData;
-  } catch (error) {
-    console.warn("Gemini API call failed or rate limited, generating fallback intelligent roadmap:", error.message);
-    return generateFallbackRoadmap({
-      targetRole,
-      experienceLevel,
-      missingCoreSkills,
-      missingOptionalSkills,
-    });
+  // Candidate models in speed / capability priority order
+  const models = ["gemini-3.1-flash-lite", "gemini-3.5-flash-lite"];
+
+  for (const model of models) {
+    try {
+      const ai = getGeminiClient();
+
+      // Enforce an 8.5-second timeout per model attempt to keep UX snappy
+      const apiCall = ai.models.generateContent({
+        model,
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+          maxOutputTokens: 1500,
+          temperature: 0.2,
+        },
+      });
+
+      const response = await Promise.race([
+        apiCall,
+        timeoutPromise(8500, `Gemini model ${model} timed out after 8.5s`),
+      ]);
+
+      if (response && response.text) {
+        const parsedData = JSON.parse(response.text);
+        if (parsedData && parsedData.timelinePhases && parsedData.timelinePhases.length > 0) {
+          console.log(`[Gemini] Generated personalized roadmap using ${model} successfully.`);
+          return parsedData;
+        }
+      }
+    } catch (modelError) {
+      console.warn(`[Gemini] ${model} attempt failed: ${modelError.message}. Trying next fallback...`);
+    }
   }
+
+  // If both models fail or timeout, seamlessly return the intelligent localized fallback
+  console.info("[Gemini] Engaging resilient career fallback roadmap generator.");
+  return generateFallbackRoadmap({
+    targetRole,
+    experienceLevel,
+    missingCoreSkills,
+    missingOptionalSkills,
+  });
 }
 
 // Resilient fallback generator to ensure demos and offline viva reviews never fail
