@@ -9,7 +9,7 @@ interface SkillGapTabProps {
   roles: CareerRole[];
   onGoToEdit: () => void;
   onUpdateTargetRole: (newRoleTitle: string) => void;
-  onGoToRoadmap: () => void;
+  onGoToRoadmap?: () => void;
 }
 
 export default function SkillGapTab({
@@ -17,7 +17,6 @@ export default function SkillGapTab({
   roles,
   onGoToEdit,
   onUpdateTargetRole,
-  onGoToRoadmap,
 }: SkillGapTabProps) {
   const targetRole = profile?.targetRole;
   const userSkills = profile?.currentSkills || [];
@@ -286,31 +285,6 @@ export default function SkillGapTab({
           </div>
         </div>
       )}
-
-      {/* Gemini AI Learning Roadmap Action Card */}
-      <div className="card ai-teaser-card active-ai-card">
-        <div className="ai-teaser-badge">Powered by Google Gemini Flash AI</div>
-        <div className="ai-teaser-body">
-          <div className="ai-teaser-icon">🤖</div>
-          <div className="ai-teaser-text">
-            <h3>Generate Personalized AI Learning Roadmap</h3>
-            <p>
-              Ready to close the gap? Google Gemini will analyze your{" "}
-              <strong>{analysis?.breakdown.core.missingCount || 0} critical skill gaps</strong> and
-              build a step-by-step weekly roadmap, interactive checklist, and portfolio project suggestions for you!
-            </p>
-            <div className="ai-cta-action">
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={onGoToRoadmap}
-              >
-                🚀 Open AI Learning Roadmap
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Role Explorer Modal */}
       <RoleExplorerModal
