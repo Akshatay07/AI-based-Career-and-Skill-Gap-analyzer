@@ -100,25 +100,13 @@ export default function SkillGapTab({
               )}
             </div>
 
-            <div className="role-actions-top">
-              {isSimulated && (
-                <button
-                  type="button"
-                  className="role-reset-btn"
-                  onClick={() => setActiveComparisonRole(targetRole)}
-                  title={`Return to your target role (${targetRole})`}
-                >
-                  ↩ Return to {targetRole}
-                </button>
-              )}
-              <button
-                type="button"
-                className="role-compare-btn"
-                onClick={() => setIsExplorerOpen(true)}
-              >
-                🔄 Compare With Another Role
-              </button>
-            </div>
+            <button
+              type="button"
+              className="role-compare-btn"
+              onClick={() => setIsExplorerOpen(true)}
+            >
+              🔄 Compare With Another Role
+            </button>
           </div>
 
           <h2 className="gap-title">
