@@ -91,16 +91,34 @@ export default function SkillGapTab({
       <div className="card gap-summary-banner">
         <div className="gap-banner-content">
           <div className="role-switch-row">
-            <span className="gap-kicker">
-              {isSimulated ? "Simulated Comparison Role" : "Target Role Readiness"}
-            </span>
-            <button
-              type="button"
-              className="role-compare-btn"
-              onClick={() => setIsExplorerOpen(true)}
-            >
-              🔄 Compare With Another Role
-            </button>
+            <div className="gap-kicker-wrap">
+              <span className="gap-kicker">
+                {isSimulated ? "Simulated Comparison Role" : "Target Role Readiness"}
+              </span>
+              {isSimulated && (
+                <span className="sim-preview-badge">Preview</span>
+              )}
+            </div>
+
+            <div className="role-actions-top">
+              {isSimulated && (
+                <button
+                  type="button"
+                  className="role-reset-btn"
+                  onClick={() => setActiveComparisonRole(targetRole)}
+                  title={`Return to your target role (${targetRole})`}
+                >
+                  ↩ Return to {targetRole}
+                </button>
+              )}
+              <button
+                type="button"
+                className="role-compare-btn"
+                onClick={() => setIsExplorerOpen(true)}
+              >
+                🔄 Compare With Another Role
+              </button>
+            </div>
           </div>
 
           <h2 className="gap-title">
@@ -114,17 +132,30 @@ export default function SkillGapTab({
 
           {isSimulated && (
             <div className="simulation-notice-bar">
-              <span>
-                💡 You are previewing <strong>{activeComparisonRole}</strong>. Your saved profile target is{" "}
-                <strong>{targetRole}</strong>.
-              </span>
-              <button
-                type="button"
-                className="btn btn-sm btn-primary"
-                onClick={() => onUpdateTargetRole(activeComparisonRole)}
-              >
-                Set As My Target Role
-              </button>
+              <div className="simulation-text">
+                <span className="sim-icon">💡</span>
+                <span>
+                  You are previewing <strong>{activeComparisonRole}</strong>. Your saved profile target is{" "}
+                  <strong>{targetRole}</strong>.
+                </span>
+              </div>
+              <div className="simulation-actions-group">
+                <button
+                  type="button"
+                  className="btn btn-sm btn-return-role"
+                  onClick={() => setActiveComparisonRole(targetRole)}
+                  title={`Discard preview and return to ${targetRole}`}
+                >
+                  ↩ Return to {targetRole}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-primary"
+                  onClick={() => onUpdateTargetRole(activeComparisonRole)}
+                >
+                  ⭐ Set As My Target Role
+                </button>
+              </div>
             </div>
           )}
         </div>
