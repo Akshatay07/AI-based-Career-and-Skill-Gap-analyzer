@@ -64,7 +64,7 @@ export default function EditProfileView({
   const [isResumeModalOpen, setIsResumeModalOpen] = useState(false);
 
   const handleApplyResumeData = (data: ParsedResumeData) => {
-    if (data.suggestedTargetRole && !targetRole) {
+    if (data.suggestedTargetRole) {
       setTargetRole(data.suggestedTargetRole);
     }
     if (data.experienceLevel) {
@@ -75,6 +75,9 @@ export default function EditProfileView({
     }
     if (data.education?.fieldOfStudy) {
       setFieldOfStudy(data.education.fieldOfStudy);
+    }
+    if (data.education?.institution) {
+      setInstitution(data.education.institution);
     }
     if (data.education?.graduationYear) {
       const year = parseInt(data.education.graduationYear, 10);
@@ -88,7 +91,9 @@ export default function EditProfileView({
         return [...prev, ...newOnes];
       });
     }
-    setSuccessMessage("Skills and education imported from resume! Review the details below and click 'Save Changes'.");
+    setSuccessMessage(
+      "Resume details (skills, education, and target role) applied! Review the details below and click 'Save Profile Changes' to commit to MongoDB."
+    );
   };
 
   useEffect(() => {

@@ -24,6 +24,15 @@ export default function ResumeUploadModal({
   const [parsedData, setParsedData] = useState<ParsedResumeData | null>(null);
   const [editableSkills, setEditableSkills] = useState<string[]>([]);
   const [newSkillInput, setNewSkillInput] = useState("");
+
+  // Editable fields for education and career direction extracted from resume
+  const [editableRole, setEditableRole] = useState("");
+  const [editableExpLevel, setEditableExpLevel] = useState<UserProfile["experienceLevel"]>("Fresher/Student");
+  const [editableDegree, setEditableDegree] = useState("");
+  const [editableFieldOfStudy, setEditableFieldOfStudy] = useState("");
+  const [editableInstitution, setEditableInstitution] = useState("");
+  const [editableGradYear, setEditableGradYear] = useState("");
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen) return null;
@@ -112,6 +121,14 @@ export default function ResumeUploadModal({
       const result = await parseResumeWithAi(token, payload);
       setParsedData(result);
       setEditableSkills(result.extractedSkills || []);
+      setEditableRole(result.suggestedTargetRole || "");
+      if (result.experienceLevel) {
+        setEditableExpLevel(result.experienceLevel);
+      }
+      setEditableDegree(result.education?.degree || "");
+      setEditableFieldOfStudy(result.education?.fieldOfStudy || "");
+      setEditableInstitution(result.education?.institution || "");
+      setEditableGradYear(result.education?.graduationYear || "");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to analyze resume.");
     } finally {
@@ -139,6 +156,14 @@ export default function ResumeUploadModal({
     if (!parsedData) return;
     const finalData: ParsedResumeData = {
       ...parsedData,
+      suggestedTargetRole: editableRole.trim(),
+      experienceLevel: editableExpLevel,
+      education: {
+        degree: editableDegree.trim(),
+        fieldOfStudy: editableFieldOfStudy.trim(),
+        institution: editableInstitution.trim(),
+        graduationYear: editableGradYear.trim(),
+      },
       extractedSkills: editableSkills,
     };
     onApplyResumeData(finalData);
@@ -148,6 +173,12 @@ export default function ResumeUploadModal({
   const handleReset = () => {
     setParsedData(null);
     setEditableSkills([]);
+    setEditableRole("");
+    setEditableExpLevel("Fresher/Student");
+    setEditableDegree("");
+    setEditableFieldOfStudy("");
+    setEditableInstitution("");
+    setEditableGradYear("");
     setSelectedFile(null);
     setResumeText("");
     setError("");
@@ -331,39 +362,88 @@ export default function ResumeUploadModal({
                 </span>
               </div>
 
-              {/* Extracted Profile Highlights */}
-              <div className="parsed-highlights-grid">
-                {parsedData.name && (
-                  <div className="parsed-highlight-item">
-                    <span className="highlight-label">Candidate Name</span>
-                    <strong className="highlight-val">{parsedData.name}</strong>
+              {/* Extracted Profile & Education Editor */}
+              <div className="parsed-education-editor-card">
+                <div className="editor-card-header">
+                  <div>
+                    <h4 className="editor-title">🎓 Education &amp; Career Alignment</h4>
+                    <p className="editor-sub">
+                      Extracted from your resume. Review and refine any details before saving:
+                    </p>
                   </div>
-                )}
+                  <span className="editor-badge">Auto-Filled</span>
+                </div>
 
-                {parsedData.suggestedTargetRole && (
-                  <div className="parsed-highlight-item">
-                    <span className="highlight-label">Suggested Career Role</span>
-                    <strong className="highlight-val role-val">🎯 {parsedData.suggestedTargetRole}</strong>
+                <div className="education-editor-grid">
+                  <div className="form-group">
+                    <label className="editor-field-label">Degree</label>
+                    <input
+                      type="text"
+                      className="form-control editor-input"
+                      value={editableDegree}
+                      onChange={(e) => setEditableDegree(e.target.value)}
+                      placeholder="e.g. B.E. / B.Tech"
+                    />
                   </div>
-                )}
 
-                {parsedData.experienceLevel && (
-                  <div className="parsed-highlight-item">
-                    <span className="highlight-label">Experience Level</span>
-                    <strong className="highlight-val">{parsedData.experienceLevel}</strong>
+                  <div className="form-group">
+                    <label className="editor-field-label">Field of Study / Branch</label>
+                    <input
+                      type="text"
+                      className="form-control editor-input"
+                      value={editableFieldOfStudy}
+                      onChange={(e) => setEditableFieldOfStudy(e.target.value)}
+                      placeholder="e.g. Information Science and Engineering"
+                    />
                   </div>
-                )}
 
-                {parsedData.education?.degree && (
-                  <div className="parsed-highlight-item">
-                    <span className="highlight-label">Education</span>
-                    <strong className="highlight-val">
-                      🎓 {parsedData.education.degree}
-                      {parsedData.education.fieldOfStudy ? ` in ${parsedData.education.fieldOfStudy}` : ""}
-                      {parsedData.education.graduationYear ? ` ('${parsedData.education.graduationYear.slice(-2)})` : ""}
-                    </strong>
+                  <div className="form-group">
+                    <label className="editor-field-label">Institution / College</label>
+                    <input
+                      type="text"
+                      className="form-control editor-input"
+                      value={editableInstitution}
+                      onChange={(e) => setEditableInstitution(e.target.value)}
+                      placeholder="e.g. Engineering College / University"
+                    />
                   </div>
-                )}
+
+                  <div className="form-group">
+                    <label className="editor-field-label">Graduation Year</label>
+                    <input
+                      type="text"
+                      className="form-control editor-input"
+                      value={editableGradYear}
+                      onChange={(e) => setEditableGradYear(e.target.value)}
+                      placeholder="e.g. 2026"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="editor-field-label">Suggested Career Goal</label>
+                    <input
+                      type="text"
+                      className="form-control editor-input"
+                      value={editableRole}
+                      onChange={(e) => setEditableRole(e.target.value)}
+                      placeholder="e.g. Full Stack Developer"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="editor-field-label">Experience Level</label>
+                    <select
+                      className="form-control editor-input"
+                      value={editableExpLevel}
+                      onChange={(e) => setEditableExpLevel(e.target.value as any)}
+                    >
+                      <option value="Fresher/Student">Fresher / Student</option>
+                      <option value="Entry Level">Entry Level (0-2 Yrs)</option>
+                      <option value="Intermediate">Intermediate (2-5 Yrs)</option>
+                      <option value="Experienced">Experienced (5+ Yrs)</option>
+                    </select>
+                  </div>
+                </div>
               </div>
 
               {/* Summary */}
@@ -440,7 +520,7 @@ export default function ResumeUploadModal({
                   className="btn btn-primary btn-lg"
                   onClick={handleApply}
                 >
-                  ✓ Apply Extracted Skills to Profile
+                  ✓ Apply Skills &amp; Education to Profile
                 </button>
               </div>
             </div>
@@ -450,3 +530,4 @@ export default function ResumeUploadModal({
     </div>
   );
 }
+

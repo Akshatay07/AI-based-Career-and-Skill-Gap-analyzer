@@ -242,7 +242,8 @@ Extract and return ONLY a valid JSON object matching this schema:
   "suggestedTargetRole": "Standardized best-match job role, e.g. Cybersecurity Analyst | Full Stack Developer | Frontend Developer | Backend Developer | Data Scientist | DevOps Engineer | Cloud Engineer",
   "education": {
     "degree": "e.g. B.Tech | B.E. | B.S. | M.S. | MCA",
-    "fieldOfStudy": "e.g. Computer Science and Engineering",
+    "fieldOfStudy": "e.g. Computer Science and Engineering | Information Science",
+    "institution": "e.g. University / College / Institute name from resume",
     "graduationYear": "e.g. 2026"
   },
   "extractedSkills": ["Skill 1", "Skill 2"],

@@ -3093,6 +3093,66 @@ select.form-control {
   border-radius: var(--radius-full);
 }
 
+/* Editable Education & Credentials Section in Resume Modal */
+.parsed-education-editor-card {
+  background: rgba(17, 23, 38, 0.7);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.editor-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.editor-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.editor-sub {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.editor-badge {
+  background: rgba(139, 92, 246, 0.18);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  color: #c4b5fd;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.education-editor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.editor-field-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #c7d2fe;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.editor-input {
+  font-size: 13px;
+  padding: 8px 12px;
+}
+
 .parsed-highlights-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));

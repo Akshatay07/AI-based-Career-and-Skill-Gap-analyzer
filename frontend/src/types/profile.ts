@@ -33,6 +33,7 @@ export interface ParsedResumeData {
   education?: {
     degree?: string;
     fieldOfStudy?: string;
+    institution?: string;
     graduationYear?: string;
   };
   extractedSkills: string[];
