@@ -247,7 +247,8 @@ export async function parseResumeWithAi(
 // Analyze any unstructured job description from LinkedIn/Indeed
 export async function analyzeCustomJobWithAi(
   token: string,
-  jobText: string
+  jobText: string,
+  candidateSkills?: string[]
 ): Promise<RoleAnalysisResult> {
   const response = await fetch(`${API_BASE_URL}/ai/analyze-job`, {
     method: "POST",
@@ -255,7 +256,10 @@ export async function analyzeCustomJobWithAi(
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ jobText }),
+    body: JSON.stringify({
+      jobText,
+      candidateSkills: Array.isArray(candidateSkills) ? candidateSkills : undefined,
+    }),
   });
 
   const result = await response.json();

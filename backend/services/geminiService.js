@@ -335,30 +335,53 @@ function fallbackResumeParser(text) {
 }
 
 // ============================================================================
-// AI CUSTOM JOB DESCRIPTION PARSER (Gemini Flash AI)
+// AI CUSTOM JOB DESCRIPTION PARSER & SEMANTIC MATCHER (Gemini Flash AI)
 // ============================================================================
-export async function parseJobDescription({ jobText }) {
-  const prompt = `You are a Senior Talent Intelligence and Job Architecture AI.
-Analyze the following raw job posting description and extract its structured role profile.
+export async function parseJobDescription({ jobText, candidateSkills = [] }) {
+  const candidateSkillsText =
+    Array.isArray(candidateSkills) && candidateSkills.length > 0
+      ? candidateSkills.join(", ")
+      : "None provided";
+
+  const prompt = `You are a Senior Talent Intelligence and Technical Job Architecture AI.
+Analyze the following raw job posting description and extract its structured role profile, while evaluating candidate readiness.
 
 Job Description Text:
 ${jobText}
 
+Candidate's Current Skills Arsenal:
+${candidateSkillsText}
+
 Extract and return ONLY a valid JSON object matching this schema:
 {
-  "title": "Clean standardized role title",
+  "title": "Clean standardized role title (e.g. 'Full Stack AI Engineer')",
   "category": "e.g. Cybersecurity | Cloud Computing | Software Engineering | AI / Data | DevOps",
   "experienceLevel": "Fresher/Student | Entry Level | Mid Level | Senior",
   "description": "Concise 2-sentence summary of the role",
   "coreSkills": ["Skill 1", "Skill 2"],
-  "optionalSkills": ["Skill 1", "Skill 2"]
+  "optionalSkills": ["Skill 1", "Skill 2"],
+  "matchedCore": ["Skill from coreSkills that candidate satisfies"],
+  "matchedOptional": ["Skill from optionalSkills that candidate satisfies"]
 }
 
-Rules:
-- Standardize skill names into industry canonical terms (e.g., 'AWS IAM' -> 'AWS', 'bash' -> 'Bash Scripting').
-- Strictly separate MUST-HAVE/Core requirements from BONUS/Good to have skills.
-- Return 4 to 8 coreSkills and 3 to 6 optionalSkills.
-- Keep output strictly formatted as JSON without markdown.`;
+CRITICAL RULES:
+1. ATOMIC, CONCRETE SKILLS ONLY:
+   - Extract ONLY concrete technologies, programming languages, databases, developer frameworks, libraries, cloud platforms, and security tools (e.g. 'JavaScript', 'TypeScript', 'Python', 'React', 'Node.js', 'PostgreSQL', 'Docker', 'AWS', 'LangChain', 'FastAPI', 'MongoDB', 'REST APIs').
+   - NEVER output broad umbrella phrases, vague disciplines, or soft skills. (NEVER return 'Full Stack Development', 'Software Architecture', 'Problem Solving', 'Workflow Automation', 'Engineering', or 'Communication').
+   - If the job posting mentions 'Full Stack', decompose it into the concrete frontend and backend technologies specified in the text (e.g., 'React', 'Node.js', 'SQL').
+   - Return 5 to 8 must-have coreSkills and 3 to 6 optional/bonus skills.
+
+2. SEMANTIC RECRUITER MATCHING:
+   - Review the candidate's skills against each extracted skill in coreSkills and optionalSkills.
+   - Use intelligent semantic matching and synonym equivalence:
+     * 'JavaScript' and 'TypeScript' satisfy frontend scripting / JavaScript requirements.
+     * 'Node.js' or 'Express' satisfies backend Node.js / Express requirements.
+     * 'mlops' or 'AWS' satisfies cloud deployment, ML ops, or AI infrastructure requirements.
+     * 'MySQL', 'MongoDB', or 'PostgreSQL' satisfies relevant database requirements.
+     * Standard technical aliases and abbreviations (e.g. 'JS' -> 'JavaScript', 'K8s' -> 'Kubernetes', 'PY' -> 'Python') must match.
+   - 'matchedCore' must contain only skills that are listed in 'coreSkills' and satisfied by the candidate.
+   - 'matchedOptional' must contain only skills that are listed in 'optionalSkills' and satisfied by the candidate.
+- Return ONLY the JSON object without markdown fences.`;
 
   const models = ["gemini-3.1-flash-lite", "gemini-3.5-flash-lite"];
 
@@ -371,7 +394,7 @@ Rules:
         config: {
           responseMimeType: "application/json",
           temperature: 0.1,
-          maxOutputTokens: 1000,
+          maxOutputTokens: 1200,
         },
       });
 
@@ -384,7 +407,16 @@ Rules:
         const parsed = JSON.parse(response.text);
         if (parsed && Array.isArray(parsed.coreSkills) && parsed.coreSkills.length > 0) {
           console.log(`[Gemini] Parsed custom job description successfully using ${model}.`);
-          return parsed;
+          return {
+            title: parsed.title || "Custom Technical Role",
+            category: parsed.category || "Software Engineering",
+            experienceLevel: parsed.experienceLevel || "Entry Level",
+            description: parsed.description || "Evaluated against job posting requirements.",
+            coreSkills: parsed.coreSkills,
+            optionalSkills: Array.isArray(parsed.optionalSkills) ? parsed.optionalSkills : [],
+            matchedCore: Array.isArray(parsed.matchedCore) ? parsed.matchedCore : [],
+            matchedOptional: Array.isArray(parsed.matchedOptional) ? parsed.matchedOptional : [],
+          };
         }
       }
     } catch (err) {
@@ -392,14 +424,16 @@ Rules:
     }
   }
 
-  // Resilient fallback for job description
+  // Resilient fallback for job description with atomic tech skills
   return {
     title: "Custom Industry Role",
     category: "Software Engineering",
     experienceLevel: "Entry Level",
     description: "Evaluated against the provided custom job requirements.",
-    coreSkills: ["Core Technical Architecture", "System Design", "Data Structures"],
-    optionalSkills: ["Cloud Infrastructure", "CI/CD Pipelines"],
+    coreSkills: ["Python", "JavaScript", "REST APIs", "SQL", "Git"],
+    optionalSkills: ["Docker", "AWS", "CI/CD"],
+    matchedCore: [],
+    matchedOptional: [],
   };
 }
 

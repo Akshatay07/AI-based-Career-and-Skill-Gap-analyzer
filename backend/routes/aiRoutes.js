@@ -5,8 +5,70 @@ import { parseResume, parseJobDescription } from "../services/geminiService.js";
 
 const router = express.Router();
 
+// Technical aliases and canonical mappings for resilient matching
+const ALIAS_MAP = {
+  js: "javascript",
+  javascript: "javascript",
+  ts: "typescript",
+  typescript: "typescript",
+  py: "python",
+  python: "python",
+  "node.js": "node.js",
+  nodejs: "node.js",
+  node: "node.js",
+  express: "express.js",
+  expressjs: "express.js",
+  "express.js": "express.js",
+  react: "react",
+  reactjs: "react",
+  "react.js": "react",
+  next: "next.js",
+  nextjs: "next.js",
+  "next.js": "next.js",
+  vue: "vue.js",
+  vuejs: "vue.js",
+  mongo: "mongodb",
+  mongodb: "mongodb",
+  postgres: "postgresql",
+  postgresql: "postgresql",
+  k8s: "kubernetes",
+  kubernetes: "kubernetes",
+  docker: "docker",
+  aws: "aws",
+  gcp: "gcp",
+  azure: "azure",
+  git: "git",
+  github: "git",
+  linux: "linux",
+  ml: "machine learning",
+  mlops: "mlops",
+  rag: "retrieval-augmented generation",
+  llm: "large language models",
+  llms: "large language models",
+  rest: "rest apis",
+  "rest api": "rest apis",
+  "rest apis": "rest apis",
+  "restful api": "rest apis",
+  "restful apis": "rest apis",
+  sql: "sql",
+  mysql: "mysql",
+};
+
 function normalizeSkill(s) {
-  return s.trim().toLowerCase();
+  return (s || "").trim().toLowerCase();
+}
+
+function isAlgorithmicMatch(userSkillRaw, jobSkillRaw) {
+  const u = normalizeSkill(userSkillRaw);
+  const j = normalizeSkill(jobSkillRaw);
+  if (!u || !j) return false;
+  if (u === j) return true;
+  if (ALIAS_MAP[u] && ALIAS_MAP[j] && ALIAS_MAP[u] === ALIAS_MAP[j]) return true;
+  // Substring containment for multi-word or compound skill names (min length 3 to prevent false positives like 'c')
+  if (u.length >= 3 && j.length >= 3) {
+    if (j.includes(u) || u.includes(j)) return true;
+  }
+  return false;
 }
 
 // @route   POST /api/ai/parse-resume
@@ -48,7 +110,7 @@ router.post("/parse-resume", protect, async (req, res) => {
 // @access  Private
 router.post("/analyze-job", protect, async (req, res) => {
   try {
-    const { jobText } = req.body;
+    const { jobText, candidateSkills } = req.body;
 
     if (!jobText || jobText.trim().length < 20) {
       return res.status(400).json({
@@ -57,28 +119,43 @@ router.post("/analyze-job", protect, async (req, res) => {
       });
     }
 
-    // Extract structured role specifications from raw job text using Gemini Flash AI
-    const roleProfile = await parseJobDescription({ jobText });
-
-    // Fetch user profile to compare skills
+    // Fetch user profile from DB if candidateSkills are not explicitly provided by client
     const userProfile = await UserProfile.findOne({ user: req.user._id });
-    const userSkills = userProfile?.currentSkills || [];
-    const userSkillSet = new Set(userSkills.map(normalizeSkill));
+    const userSkills =
+      Array.isArray(candidateSkills) && candidateSkills.length > 0
+        ? candidateSkills
+        : userProfile?.currentSkills || [];
 
-    // Core requirements evaluation
-    const matchedCore = roleProfile.coreSkills.filter((s) =>
-      userSkillSet.has(normalizeSkill(s))
+    // Extract structured role specifications and perform AI recruiter matching with Gemini Flash
+    const roleProfile = await parseJobDescription({
+      jobText,
+      candidateSkills: userSkills,
+    });
+
+    // Combine Gemini's semantic matching with algorithmic alias/synonym normalization
+    const geminiMatchedCoreSet = new Set(
+      (roleProfile.matchedCore || []).map(normalizeSkill)
     );
+    const matchedCore = roleProfile.coreSkills.filter((s) => {
+      const normS = normalizeSkill(s);
+      if (geminiMatchedCoreSet.has(normS)) return true;
+      return userSkills.some((u) => isAlgorithmicMatch(u, s));
+    });
     const missingCore = roleProfile.coreSkills.filter(
-      (s) => !userSkillSet.has(normalizeSkill(s))
+      (s) => !matchedCore.includes(s)
     );
 
     // Optional requirements evaluation
-    const matchedOptional = roleProfile.optionalSkills.filter((s) =>
-      userSkillSet.has(normalizeSkill(s))
+    const geminiMatchedOptionalSet = new Set(
+      (roleProfile.matchedOptional || []).map(normalizeSkill)
     );
+    const matchedOptional = roleProfile.optionalSkills.filter((s) => {
+      const normS = normalizeSkill(s);
+      if (geminiMatchedOptionalSet.has(normS)) return true;
+      return userSkills.some((u) => isAlgorithmicMatch(u, s));
+    });
     const missingOptional = roleProfile.optionalSkills.filter(
-      (s) => !userSkillSet.has(normalizeSkill(s))
+      (s) => !matchedOptional.includes(s)
     );
 
     const totalCore = roleProfile.coreSkills.length;

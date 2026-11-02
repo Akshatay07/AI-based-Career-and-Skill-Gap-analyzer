@@ -107,7 +107,11 @@ export default function CustomJobTab({
     setLoading(true);
 
     try {
-      const result = await analyzeCustomJobWithAi(token, jobText.trim());
+      const result = await analyzeCustomJobWithAi(
+        token,
+        jobText.trim(),
+        profile?.currentSkills
+      );
       setAnalysisResult(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to analyze job description.");
