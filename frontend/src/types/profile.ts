@@ -25,3 +25,16 @@ export interface CreateProfileInput {
   experienceLevel: 'Fresher/Student' | 'Entry Level' | 'Intermediate' | 'Experienced';
   education: Education;
 }
+
+export interface ParsedResumeData {
+  name?: string;
+  experienceLevel?: 'Fresher/Student' | 'Entry Level' | 'Intermediate' | 'Experienced';
+  suggestedTargetRole?: string;
+  education?: {
+    degree?: string;
+    fieldOfStudy?: string;
+    graduationYear?: string;
+  };
+  extractedSkills: string[];
+  summary?: string;
+}

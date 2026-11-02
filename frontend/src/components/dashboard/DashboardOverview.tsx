@@ -173,7 +173,14 @@ export default function DashboardOverview({
               className="btn btn-secondary btn-block"
               onClick={onGoToEdit}
             >
-              + Add / Edit Skills in Arsenal
+              ✏️ Add / Edit Skills in Arsenal
+            </button>
+            <button
+              type="button"
+              className="btn btn-ai-resume-quick btn-block"
+              onClick={onGoToEdit}
+            >
+              📄 Auto-Fill from Resume (Gemini AI)
             </button>
           </div>
         </div>

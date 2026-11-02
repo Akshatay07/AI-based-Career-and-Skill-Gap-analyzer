@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import type { UserProfile, CreateProfileInput } from "../../types/profile";
+import type { UserProfile, CreateProfileInput, ParsedResumeData } from "../../types/profile";
 import type { CareerRole } from "../../types/role";
 import { saveMyProfile } from "../../services/api";
+import ResumeUploadModal from "./ResumeUploadModal";
 
 interface EditProfileViewProps {
   token: string | null;
@@ -60,6 +61,35 @@ export default function EditProfileView({
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [isResumeModalOpen, setIsResumeModalOpen] = useState(false);
+
+  const handleApplyResumeData = (data: ParsedResumeData) => {
+    if (data.suggestedTargetRole && !targetRole) {
+      setTargetRole(data.suggestedTargetRole);
+    }
+    if (data.experienceLevel) {
+      setExperienceLevel(data.experienceLevel);
+    }
+    if (data.education?.degree) {
+      setDegree(data.education.degree);
+    }
+    if (data.education?.fieldOfStudy) {
+      setFieldOfStudy(data.education.fieldOfStudy);
+    }
+    if (data.education?.graduationYear) {
+      const year = parseInt(data.education.graduationYear, 10);
+      if (!isNaN(year)) setGraduationYear(year);
+    }
+    if (data.extractedSkills && data.extractedSkills.length > 0) {
+      // Merge unique skills
+      setSkills((prev) => {
+        const set = new Set(prev.map((s) => s.toLowerCase()));
+        const newOnes = data.extractedSkills.filter((s) => !set.has(s.toLowerCase()));
+        return [...prev, ...newOnes];
+      });
+    }
+    setSuccessMessage("Skills and education imported from resume! Review the details below and click 'Save Changes'.");
+  };
 
   useEffect(() => {
     if (initialProfile) {
@@ -194,6 +224,30 @@ export default function EditProfileView({
           <div>{errorMessage}</div>
         </div>
       )}
+
+      {/* AI Resume Import Quick Action Banner */}
+      <div className="card resume-import-banner">
+        <div className="resume-banner-content">
+          <div className="resume-banner-icon">📄</div>
+          <div>
+            <div className="resume-banner-tag">
+              <span className="ai-sparkle-dot"></span>
+              <span>Google Gemini Flash AI</span>
+            </div>
+            <h3 className="resume-banner-title">Auto-Fill Profile with AI Resume Parser</h3>
+            <p className="resume-banner-sub">
+              Upload your resume (PDF) or paste raw text. Gemini Flash will automatically extract and populate your skills, education, and experience level in seconds!
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          className="btn btn-primary btn-resume-banner"
+          onClick={() => setIsResumeModalOpen(true)}
+        >
+          ⚡ Auto-Fill from Resume
+        </button>
+      </div>
 
       <form onSubmit={handleSubmit} className="edit-profile-form">
         {/* Section 1: Target Career Goal */}
@@ -438,6 +492,14 @@ export default function EditProfileView({
           </button>
         </div>
       </form>
+
+      <ResumeUploadModal
+        isOpen={isResumeModalOpen}
+        onClose={() => setIsResumeModalOpen(false)}
+        token={token}
+        currentProfile={initialProfile}
+        onApplyResumeData={handleApplyResumeData}
+      />
     </div>
   );
 }

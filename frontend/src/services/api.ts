@@ -1,4 +1,4 @@
-import type { UserProfile, CreateProfileInput } from "../types/profile";
+import type { UserProfile, CreateProfileInput, ParsedResumeData } from "../types/profile";
 import type { AuthUser, AuthResponse } from "../types/auth";
 import type { CareerRole, RoleAnalysisResult } from "../types/role";
 import type { Roadmap } from "../types/roadmap";
@@ -220,4 +220,48 @@ export async function fetchProfiles(): Promise<UserProfile[]> {
   }
   const result = await response.json();
   return result.data || [];
+}
+
+// Parse Resume (PDF base64 or raw text) using Gemini Flash AI
+export async function parseResumeWithAi(
+  token: string,
+  payload: { resumeText?: string; pdfBase64?: string; mimeType?: string }
+): Promise<ParsedResumeData> {
+  const response = await fetch(`${API_BASE_URL}/ai/parse-resume`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const result = await response.json();
+  if (!response.ok || !result.success) {
+    throw new Error(result.message || "Failed to analyze resume with AI");
+  }
+
+  return result.data;
+}
+
+// Analyze any unstructured job description from LinkedIn/Indeed
+export async function analyzeCustomJobWithAi(
+  token: string,
+  jobText: string
+): Promise<RoleAnalysisResult> {
+  const response = await fetch(`${API_BASE_URL}/ai/analyze-job`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ jobText }),
+  });
+
+  const result = await response.json();
+  if (!response.ok || !result.success) {
+    throw new Error(result.message || "Failed to analyze custom job posting");
+  }
+
+  return result.data;
 }
