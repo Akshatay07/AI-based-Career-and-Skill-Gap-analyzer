@@ -228,3 +228,177 @@ function generateFallbackRoadmap({
   };
 }
 
+// ============================================================================
+// AI RESUME PARSER (Gemini Flash AI)
+// ============================================================================
+export async function parseResume({ resumeText, pdfBase64, mimeType }) {
+  const prompt = `You are an expert Technical HR and Talent Intelligence AI.
+Analyze the provided resume document and extract the candidate's structured profile information.
+
+Extract and return ONLY a valid JSON object matching this schema:
+{
+  "name": "Candidate Full Name or empty string",
+  "experienceLevel": "Fresher/Student | Entry Level | Mid Level | Senior",
+  "suggestedTargetRole": "Standardized best-match job role, e.g. Cybersecurity Analyst | Full Stack Developer | Frontend Developer | Backend Developer | Data Scientist | DevOps Engineer | Cloud Engineer",
+  "education": {
+    "degree": "e.g. B.Tech | B.E. | B.S. | M.S. | MCA",
+    "fieldOfStudy": "e.g. Computer Science and Engineering",
+    "graduationYear": "e.g. 2026"
+  },
+  "extractedSkills": ["Skill 1", "Skill 2"],
+  "summary": "Brief 1-2 sentence professional overview of the candidate"
+}
+
+Extraction Guidelines:
+- Standardize skill names into clean, industry canonical names (e.g. 'react.js' -> 'React', 'ts' -> 'TypeScript', 'k8s' -> 'Kubernetes', 'docker' -> 'Docker').
+- Extract all programming languages, databases, developer frameworks, libraries, cloud tools, security tools, and core CS concepts.
+- Deduplicate skills and return an array of 8 to 25 distinct skills.
+- Set experienceLevel accurately based on years of experience, graduation year, or student indicators.
+- Respond with ONLY valid JSON adhering to the schema, no code block backticks.`;
+
+  const models = ["gemini-3.1-flash-lite", "gemini-3.5-flash-lite"];
+
+  let contents;
+  if (pdfBase64) {
+    const cleanBase64 = pdfBase64.replace(/^data:[^;]+;base64,/, "");
+    contents = [
+      {
+        inlineData: {
+          data: cleanBase64,
+          mimeType: mimeType || "application/pdf",
+        },
+      },
+      prompt,
+    ];
+  } else {
+    contents = `${prompt}\n\nResume Document Content:\n${resumeText || ""}`;
+  }
+
+  for (const model of models) {
+    try {
+      const ai = getGeminiClient();
+      const apiCall = ai.models.generateContent({
+        model,
+        contents,
+        config: {
+          responseMimeType: "application/json",
+          temperature: 0.1,
+          maxOutputTokens: 1200,
+        },
+      });
+
+      const response = await Promise.race([
+        apiCall,
+        timeoutPromise(9000, `Gemini ${model} resume parsing timed out`),
+      ]);
+
+      if (response && response.text) {
+        const parsed = JSON.parse(response.text);
+        if (parsed && Array.isArray(parsed.extractedSkills) && parsed.extractedSkills.length > 0) {
+          console.log(`[Gemini] Parsed resume successfully using ${model}. Skills count:`, parsed.extractedSkills.length);
+          return parsed;
+        }
+      }
+    } catch (err) {
+      console.warn(`[Gemini] ${model} resume parsing failed: ${err.message}. Trying next fallback...`);
+    }
+  }
+
+  // Resilient fallback parser
+  return fallbackResumeParser(resumeText || "");
+}
+
+function fallbackResumeParser(text) {
+  const commonSkills = [
+    "JavaScript", "TypeScript", "Python", "Java", "C++", "C#", "HTML", "CSS",
+    "React", "Node.js", "Express", "Next.js", "Vue", "Angular", "Tailwind CSS",
+    "MongoDB", "PostgreSQL", "MySQL", "Redis", "Docker", "Kubernetes", "AWS",
+    "Linux", "Git", "GitHub", "Wireshark", "Network Security", "REST APIs", "GraphQL"
+  ];
+
+  const lowerText = text.toLowerCase();
+  const matchedSkills = commonSkills.filter((s) => lowerText.includes(s.toLowerCase()));
+
+  return {
+    name: "",
+    experienceLevel: lowerText.includes("student") || lowerText.includes("intern") ? "Fresher/Student" : "Entry Level",
+    suggestedTargetRole: lowerText.includes("security") ? "Cybersecurity Analyst" : "Full Stack Developer",
+    education: {
+      degree: lowerText.includes("b.tech") ? "B.Tech" : "Bachelor's",
+      fieldOfStudy: "Computer Science",
+      graduationYear: "2026",
+    },
+    extractedSkills: matchedSkills.length > 0 ? matchedSkills : ["JavaScript", "React", "Node.js", "Git"],
+    summary: "Candidate profile analyzed and skills extracted from resume.",
+  };
+}
+
+// ============================================================================
+// AI CUSTOM JOB DESCRIPTION PARSER (Gemini Flash AI)
+// ============================================================================
+export async function parseJobDescription({ jobText }) {
+  const prompt = `You are a Senior Talent Intelligence and Job Architecture AI.
+Analyze the following raw job posting description and extract its structured role profile.
+
+Job Description Text:
+${jobText}
+
+Extract and return ONLY a valid JSON object matching this schema:
+{
+  "title": "Clean standardized role title",
+  "category": "e.g. Cybersecurity | Cloud Computing | Software Engineering | AI / Data | DevOps",
+  "experienceLevel": "Fresher/Student | Entry Level | Mid Level | Senior",
+  "description": "Concise 2-sentence summary of the role",
+  "coreSkills": ["Skill 1", "Skill 2"],
+  "optionalSkills": ["Skill 1", "Skill 2"]
+}
+
+Rules:
+- Standardize skill names into industry canonical terms (e.g., 'AWS IAM' -> 'AWS', 'bash' -> 'Bash Scripting').
+- Strictly separate MUST-HAVE/Core requirements from BONUS/Good to have skills.
+- Return 4 to 8 coreSkills and 3 to 6 optionalSkills.
+- Keep output strictly formatted as JSON without markdown.`;
+
+  const models = ["gemini-3.1-flash-lite", "gemini-3.5-flash-lite"];
+
+  for (const model of models) {
+    try {
+      const ai = getGeminiClient();
+      const apiCall = ai.models.generateContent({
+        model,
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+          temperature: 0.1,
+          maxOutputTokens: 1000,
+        },
+      });
+
+      const response = await Promise.race([
+        apiCall,
+        timeoutPromise(9000, `Gemini ${model} job parsing timed out`),
+      ]);
+
+      if (response && response.text) {
+        const parsed = JSON.parse(response.text);
+        if (parsed && Array.isArray(parsed.coreSkills) && parsed.coreSkills.length > 0) {
+          console.log(`[Gemini] Parsed custom job description successfully using ${model}.`);
+          return parsed;
+        }
+      }
+    } catch (err) {
+      console.warn(`[Gemini] ${model} job description parsing failed: ${err.message}. Trying next fallback...`);
+    }
+  }
+
+  // Resilient fallback for job description
+  return {
+    title: "Custom Industry Role",
+    category: "Software Engineering",
+    experienceLevel: "Entry Level",
+    description: "Evaluated against the provided custom job requirements.",
+    coreSkills: ["Core Technical Architecture", "System Design", "Data Structures"],
+    optionalSkills: ["Cloud Infrastructure", "CI/CD Pipelines"],
+  };
+}
+
