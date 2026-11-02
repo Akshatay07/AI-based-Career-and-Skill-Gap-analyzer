@@ -7,6 +7,7 @@ import DashboardOverview from "./components/dashboard/DashboardOverview";
 import EditProfileView from "./components/dashboard/EditProfileView";
 import SkillGapTab from "./components/dashboard/SkillGapTab";
 import AiRoadmapTab from "./components/dashboard/AiRoadmapTab";
+import CustomJobTab from "./components/dashboard/CustomJobTab";
 import {
   checkBackendHealth,
   getStoredToken,
@@ -32,8 +33,8 @@ function App() {
   const [loadingProfile, setLoadingProfile] = useState<boolean>(false);
   const [backendOnline, setBackendOnline] = useState<boolean | null>(null);
 
-  // Active Tab state for Dashboard ('overview' | 'gap' | 'roadmap' | 'edit')
-  const [activeTab, setActiveTab] = useState<"overview" | "gap" | "roadmap" | "edit">("overview");
+  // Active Tab state for Dashboard ('overview' | 'gap' | 'roadmap' | 'custom-job' | 'edit')
+  const [activeTab, setActiveTab] = useState<"overview" | "gap" | "roadmap" | "custom-job" | "edit">("overview");
 
   // Auth Modal State
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
@@ -170,6 +171,14 @@ function App() {
                   profile={myProfile}
                   roadmap={roadmap}
                   onRoadmapUpdated={setRoadmap}
+                  onGoToEdit={() => setActiveTab("edit")}
+                />
+              ) : activeTab === "custom-job" ? (
+                <CustomJobTab
+                  token={token}
+                  profile={myProfile}
+                  onUpdateTargetRole={handleUpdateTargetRole}
+                  onGoToRoadmap={() => setActiveTab("roadmap")}
                   onGoToEdit={() => setActiveTab("edit")}
                 />
               ) : (
