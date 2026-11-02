@@ -1118,6 +1118,8 @@
 }
 
 .form-control {
+  width: 100%;
+  box-sizing: border-box;
   background: var(--bg-input);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
@@ -3000,11 +3002,24 @@ select.form-control {
 }
 
 /* Textarea input */
+.resume-text-input-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 .resume-textarea {
+  width: 100%;
+  min-height: 200px;
+  box-sizing: border-box;
   font-family: inherit;
-  font-size: 13.5px;
+  font-size: 14px;
   line-height: 1.6;
   resize: vertical;
+  background: rgba(17, 23, 38, 0.7);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
 }
 
 .textarea-footer {
@@ -3403,11 +3418,30 @@ select.form-control {
   color: #ffffff;
 }
 
+.custom-job-textarea-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 .custom-job-textarea {
+  width: 100%;
+  min-height: 280px;
+  box-sizing: border-box;
   font-family: inherit;
-  font-size: 13.5px;
+  font-size: 14.5px;
   line-height: 1.6;
   resize: vertical;
+  background: rgba(17, 23, 38, 0.7);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  color: var(--text-primary);
+}
+
+.custom-job-textarea:focus {
+  border-color: #818cf8;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
 }
 
 .custom-job-action-footer {
