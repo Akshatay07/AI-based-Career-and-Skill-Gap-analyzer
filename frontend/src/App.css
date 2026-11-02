@@ -1396,6 +1396,54 @@ select.form-control {
   margin-bottom: 18px;
 }
 
+/* Password Input with Show/Hide Toggle */
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-input-wrapper .form-control {
+  padding-right: 44px;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  border-radius: 6px;
+  transition: color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+}
+
+.password-toggle-btn:hover {
+  color: #f1f5f9;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.password-toggle-btn:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.password-toggle-btn:focus-visible {
+  outline: 2px solid #6366f1;
+}
+
+.password-toggle-svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
 .demo-helper {
   text-align: center;
   font-size: 12.5px;
