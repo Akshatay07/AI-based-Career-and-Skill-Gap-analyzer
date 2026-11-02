@@ -92,35 +92,47 @@ router.post("/analyze-job", protect, async (req, res) => {
     const overallMatch = Math.round(coreScore * 0.75 + optionalScore * 0.25);
 
     let readinessStatus = "Foundational";
-    if (overallMatch >= 85) readinessStatus = "Job-Ready Candidate";
-    else if (overallMatch >= 65) readinessStatus = "Strong Contender";
-    else if (overallMatch >= 45) readinessStatus = "Developing Competencies";
+    let statusTone = "warning";
+    if (overallMatch >= 80) {
+      readinessStatus = "Job Ready";
+      statusTone = "success";
+    } else if (overallMatch >= 50) {
+      readinessStatus = "Intermediate";
+      statusTone = "info";
+    }
 
     res.status(200).json({
       success: true,
       message: "Job posting analyzed and skill gap calculated with Gemini Flash AI!",
       data: {
-        role: roleProfile,
+        role: {
+          _id: "custom-job-" + Date.now(),
+          title: roleProfile.title,
+          category: roleProfile.category || "Technology",
+          description: roleProfile.description,
+          demandLevel: "High",
+        },
         scores: {
           overallMatch,
-          coreScore: Math.round(coreScore),
-          optionalScore: Math.round(optionalScore),
+          coreMatch: Math.round(coreScore),
+          bonusMatch: Math.round(optionalScore),
           readinessStatus,
+          statusTone,
         },
         breakdown: {
           core: {
             total: totalCore,
             matchedCount: matchedCore.length,
             missingCount: missingCore.length,
-            matchedSkills: matchedCore,
-            missingSkills: missingCore,
+            matched: matchedCore,
+            missing: missingCore,
           },
           optional: {
             total: totalOptional,
             matchedCount: matchedOptional.length,
             missingCount: missingOptional.length,
-            matchedSkills: matchedOptional,
-            missingSkills: missingOptional,
+            matched: matchedOptional,
+            missing: missingOptional,
           },
         },
       },
