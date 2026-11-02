@@ -10,6 +10,16 @@ interface ResumeUploadModalProps {
   onApplyResumeData: (data: ParsedResumeData) => void;
 }
 
+function mapToExperienceLevel(level?: string): UserProfile["experienceLevel"] {
+  if (!level) return "Fresher/Student";
+  const l = level.toLowerCase();
+  if (l.includes("student") || l.includes("fresh") || l.includes("intern")) return "Fresher/Student";
+  if (l.includes("entry") || l.includes("junior") || l.includes("0-2") || l.includes("associate")) return "Entry Level";
+  if (l.includes("inter") || l.includes("mid") || l.includes("2-5")) return "Intermediate";
+  if (l.includes("exp") || l.includes("senior") || l.includes("lead") || l.includes("5+")) return "Experienced";
+  return "Fresher/Student";
+}
+
 export default function ResumeUploadModal({
   isOpen,
   onClose,
@@ -123,7 +133,7 @@ export default function ResumeUploadModal({
       setEditableSkills(result.extractedSkills || []);
       setEditableRole(result.suggestedTargetRole || "");
       if (result.experienceLevel) {
-        setEditableExpLevel(result.experienceLevel);
+        setEditableExpLevel(mapToExperienceLevel(result.experienceLevel));
       }
       setEditableDegree(result.education?.degree || "");
       setEditableFieldOfStudy(result.education?.fieldOfStudy || "");

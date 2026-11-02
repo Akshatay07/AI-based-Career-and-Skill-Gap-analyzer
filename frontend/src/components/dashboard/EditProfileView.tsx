@@ -32,6 +32,16 @@ const DEFAULT_SUGGESTED_SKILLS = [
   "Machine Learning",
 ];
 
+function mapToExperienceLevel(level?: string): CreateProfileInput["experienceLevel"] {
+  if (!level) return "Fresher/Student";
+  const l = level.toLowerCase();
+  if (l.includes("student") || l.includes("fresh") || l.includes("intern")) return "Fresher/Student";
+  if (l.includes("entry") || l.includes("junior") || l.includes("0-2") || l.includes("associate")) return "Entry Level";
+  if (l.includes("inter") || l.includes("mid") || l.includes("2-5")) return "Intermediate";
+  if (l.includes("exp") || l.includes("senior") || l.includes("lead") || l.includes("5+")) return "Experienced";
+  return "Fresher/Student";
+}
+
 export default function EditProfileView({
   token,
   initialProfile,
@@ -68,7 +78,7 @@ export default function EditProfileView({
       setTargetRole(data.suggestedTargetRole);
     }
     if (data.experienceLevel) {
-      setExperienceLevel(data.experienceLevel);
+      setExperienceLevel(mapToExperienceLevel(data.experienceLevel));
     }
     if (data.education?.degree) {
       setDegree(data.education.degree);

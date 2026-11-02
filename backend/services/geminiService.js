@@ -228,6 +228,16 @@ function generateFallbackRoadmap({
   };
 }
 
+function normalizeExpLevel(level) {
+  if (!level) return "Fresher/Student";
+  const l = String(level).trim().toLowerCase();
+  if (l.includes("student") || l.includes("fresh") || l.includes("intern")) return "Fresher/Student";
+  if (l.includes("entry") || l.includes("junior") || l.includes("0-2") || l.includes("associate")) return "Entry Level";
+  if (l.includes("inter") || l.includes("mid") || l.includes("2-5")) return "Intermediate";
+  if (l.includes("exp") || l.includes("senior") || l.includes("lead") || l.includes("5+")) return "Experienced";
+  return "Fresher/Student";
+}
+
 // ============================================================================
 // AI RESUME PARSER (Gemini Flash AI)
 // ============================================================================
@@ -238,7 +248,7 @@ Analyze the provided resume document and extract the candidate's structured prof
 Extract and return ONLY a valid JSON object matching this schema:
 {
   "name": "Candidate Full Name or empty string",
-  "experienceLevel": "Fresher/Student | Entry Level | Mid Level | Senior",
+  "experienceLevel": "Fresher/Student | Entry Level | Intermediate | Experienced",
   "suggestedTargetRole": "Standardized best-match job role, e.g. Cybersecurity Analyst | Full Stack Developer | Frontend Developer | Backend Developer | Data Scientist | DevOps Engineer | Cloud Engineer",
   "education": {
     "degree": "e.g. B.Tech | B.E. | B.S. | M.S. | MCA",
@@ -254,7 +264,7 @@ Extraction Guidelines:
 - Standardize skill names into clean, industry canonical names (e.g. 'react.js' -> 'React', 'ts' -> 'TypeScript', 'k8s' -> 'Kubernetes', 'docker' -> 'Docker').
 - Extract all programming languages, databases, developer frameworks, libraries, cloud tools, security tools, and core CS concepts.
 - Deduplicate skills and return an array of 8 to 25 distinct skills.
-- Set experienceLevel accurately based on years of experience, graduation year, or student indicators.
+- Set experienceLevel strictly to one of: 'Fresher/Student', 'Entry Level', 'Intermediate', or 'Experienced'.
 - Respond with ONLY valid JSON adhering to the schema, no code block backticks.`;
 
   const models = ["gemini-3.1-flash-lite", "gemini-3.5-flash-lite"];
@@ -296,6 +306,7 @@ Extraction Guidelines:
       if (response && response.text) {
         const parsed = JSON.parse(response.text);
         if (parsed && Array.isArray(parsed.extractedSkills) && parsed.extractedSkills.length > 0) {
+          parsed.experienceLevel = normalizeExpLevel(parsed.experienceLevel);
           console.log(`[Gemini] Parsed resume successfully using ${model}. Skills count:`, parsed.extractedSkills.length);
           return parsed;
         }

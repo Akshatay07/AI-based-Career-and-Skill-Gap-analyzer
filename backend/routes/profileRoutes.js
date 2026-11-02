@@ -4,6 +4,25 @@ import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
+// Normalize experience level to match UserProfile schema enum
+function normalizeExperienceLevel(level) {
+  if (!level) return "Fresher/Student";
+  const l = String(level).trim().toLowerCase();
+  if (l.includes("student") || l.includes("fresh") || l.includes("intern")) {
+    return "Fresher/Student";
+  }
+  if (l.includes("entry") || l.includes("junior") || l.includes("0-2") || l.includes("associate")) {
+    return "Entry Level";
+  }
+  if (l.includes("inter") || l.includes("mid") || l.includes("2-5")) {
+    return "Intermediate";
+  }
+  if (l.includes("exp") || l.includes("senior") || l.includes("lead") || l.includes("5+")) {
+    return "Experienced";
+  }
+  return "Fresher/Student";
+}
+
 // Helper to format skills from array or comma-separated string
 function parseSkills(currentSkills) {
   if (Array.isArray(currentSkills)) {
@@ -55,21 +74,30 @@ router.post("/me", protect, async (req, res) => {
 
     const formattedSkills = parseSkills(currentSkills);
 
+    let cleanGradYear = undefined;
+    if (
+      education?.graduationYear !== undefined &&
+      education?.graduationYear !== null &&
+      String(education.graduationYear).trim() !== ""
+    ) {
+      const parsedYear = Number(education.graduationYear);
+      if (!isNaN(parsedYear) && parsedYear > 1900 && parsedYear < 2100) {
+        cleanGradYear = parsedYear;
+      }
+    }
+
     const profileFields = {
       user: req.user._id,
       name: name?.trim() || req.user.name,
       email: req.user.email,
-      targetRole: targetRole?.trim() || "",
+      targetRole: targetRole?.trim() || "Full Stack Developer",
       currentSkills: formattedSkills,
-      experienceLevel: experienceLevel || "Fresher/Student",
+      experienceLevel: normalizeExperienceLevel(experienceLevel),
       education: {
         degree: education?.degree?.trim() || "",
         fieldOfStudy: education?.fieldOfStudy?.trim() || "",
         institution: education?.institution?.trim() || "",
-        graduationYear:
-          education?.graduationYear && !isNaN(Number(education.graduationYear))
-            ? Number(education.graduationYear)
-            : undefined,
+        graduationYear: cleanGradYear,
       },
     };
 
@@ -86,9 +114,10 @@ router.post("/me", protect, async (req, res) => {
       data: profile,
     });
   } catch (error) {
+    console.error("[Profile Update Error]:", error);
     res.status(400).json({
       success: false,
-      message: "Failed to save career profile",
+      message: error.message || "Failed to save career profile",
       error: error.message,
     });
   }
