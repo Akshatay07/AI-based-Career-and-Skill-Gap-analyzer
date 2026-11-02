@@ -26,9 +26,7 @@ export default function ResumeUploadModal({
   token,
   onApplyResumeData,
 }: ResumeUploadModalProps) {
-  const [activeTab, setActiveTab] = useState<"file" | "text">("file");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [resumeText, setResumeText] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [parsedData, setParsedData] = useState<ParsedResumeData | null>(null);
@@ -50,8 +48,8 @@ export default function ResumeUploadModal({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      if (file.type !== "application/pdf" && !file.name.endsWith(".txt") && !file.name.endsWith(".pdf")) {
-        setError("Please select a valid PDF (.pdf) or text (.txt) file.");
+      if (file.type !== "application/pdf" && !file.name.endsWith(".pdf")) {
+        setError("Please select a valid PDF (.pdf) file.");
         return;
       }
       setSelectedFile(file);
@@ -63,6 +61,10 @@ export default function ResumeUploadModal({
     e.preventDefault();
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
+      if (file.type !== "application/pdf" && !file.name.endsWith(".pdf")) {
+        setError("Please drop a valid PDF (.pdf) file.");
+        return;
+      }
       setSelectedFile(file);
       setError("");
     }
@@ -80,18 +82,14 @@ export default function ResumeUploadModal({
     });
   };
 
-  const readFileAsText = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsText(file);
-    });
-  };
-
   const handleAnalyze = async () => {
     if (!token) {
       setError("Please log in to use the AI resume parser.");
+      return;
+    }
+
+    if (!selectedFile) {
+      setError("Please select or drop a PDF file first.");
       return;
     }
 
@@ -99,34 +97,11 @@ export default function ResumeUploadModal({
     setLoading(true);
 
     try {
-      let payload: { resumeText?: string; pdfBase64?: string; mimeType?: string } = {};
-
-      if (activeTab === "file") {
-        if (!selectedFile) {
-          setError("Please select or drop a PDF file first.");
-          setLoading(false);
-          return;
-        }
-
-        if (selectedFile.type === "application/pdf" || selectedFile.name.endsWith(".pdf")) {
-          const base64 = await readFileAsBase64(selectedFile);
-          payload = {
-            pdfBase64: base64,
-            mimeType: "application/pdf",
-          };
-        } else {
-          // Plain text file
-          const text = await readFileAsText(selectedFile);
-          payload = { resumeText: text };
-        }
-      } else {
-        if (!resumeText.trim() || resumeText.trim().length < 25) {
-          setError("Please paste a meaningful portion of your resume (at least 25 characters).");
-          setLoading(false);
-          return;
-        }
-        payload = { resumeText: resumeText.trim() };
-      }
+      const base64 = await readFileAsBase64(selectedFile);
+      const payload = {
+        pdfBase64: base64,
+        mimeType: "application/pdf",
+      };
 
       const result = await parseResumeWithAi(token, payload);
       setParsedData(result);
@@ -190,7 +165,6 @@ export default function ResumeUploadModal({
     setEditableInstitution("");
     setEditableGradYear("");
     setSelectedFile(null);
-    setResumeText("");
     setError("");
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
@@ -221,7 +195,7 @@ export default function ResumeUploadModal({
             </div>
             <h2 className="resume-modal-title">AI Resume Parser & Skill Extractor</h2>
             <p className="resume-modal-sub">
-              Upload your resume or paste its text. Gemini Flash will automatically extract your
+              Upload your resume PDF. Gemini Flash will automatically extract your
               acquired technical skills, education, and suggested role in seconds.
             </p>
           </div>
@@ -233,96 +207,60 @@ export default function ResumeUploadModal({
             </div>
           )}
 
-          {/* Mode Tabs (Only when not viewing extracted results) */}
-          {!parsedData && !loading && (
-            <div className="resume-tabs-row">
-              <button
-                type="button"
-                className={`resume-tab-btn ${activeTab === "file" ? "active" : ""}`}
-                onClick={() => setActiveTab("file")}
-              >
-                📄 Upload PDF File
-              </button>
-              <button
-                type="button"
-                className={`resume-tab-btn ${activeTab === "text" ? "active" : ""}`}
-                onClick={() => setActiveTab("text")}
-              >
-                ✍️ Paste Resume Text
-              </button>
-            </div>
-          )}
-
           {/* UPLOAD FORM (State 1: Input) */}
           {!parsedData && !loading && (
             <div className="resume-input-container">
-              {activeTab === "file" ? (
-                <div
-                  className="resume-dropzone"
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={handleDrop}
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    accept=".pdf,.txt,application/pdf,text/plain"
-                    style={{ display: "none" }}
-                    onChange={handleFileChange}
-                  />
+              <div
+                className="resume-dropzone"
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  accept=".pdf,application/pdf"
+                  style={{ display: "none" }}
+                  onChange={handleFileChange}
+                />
 
-                  {selectedFile ? (
-                    <div className="dropzone-file-selected" onClick={(e) => e.stopPropagation()}>
-                      <div className="file-icon">📄</div>
-                      <div className="file-info">
-                        <strong>{selectedFile.name}</strong>
-                        <span>{(selectedFile.size / 1024).toFixed(1)} KB</span>
-                      </div>
-                      <button
-                        type="button"
-                        className="file-remove-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedFile(null);
-                          if (fileInputRef.current) fileInputRef.current.value = "";
-                        }}
-                      >
-                        ✕ Remove
-                      </button>
+                {selectedFile ? (
+                  <div className="dropzone-file-selected" onClick={(e) => e.stopPropagation()}>
+                    <div className="file-icon">📄</div>
+                    <div className="file-info">
+                      <strong>{selectedFile.name}</strong>
+                      <span>{(selectedFile.size / 1024).toFixed(1)} KB</span>
                     </div>
-                  ) : (
-                    <div className="dropzone-empty">
-                      <div className="dropzone-icon">☁️</div>
-                      <h4 className="dropzone-heading">Click or drag & drop your resume PDF</h4>
-                      <p className="dropzone-sub">Supports PDF documents (.pdf) up to 10MB</p>
-                      <button
-                        type="button"
-                        className="btn btn-secondary btn-sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          fileInputRef.current?.click();
-                        }}
-                      >
-                        Browse Files 📂
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="resume-text-input-wrap">
-                  <textarea
-                    className="form-control resume-textarea"
-                    rows={8}
-                    placeholder="Paste the text from your resume here (experience, skills, education, projects)..."
-                    value={resumeText}
-                    onChange={(e) => setResumeText(e.target.value)}
-                  />
-                  <div className="textarea-footer">
-                    <span>{resumeText.length} characters</span>
-                    <span>Gemini analyzes markdown, plain text, and bullet points</span>
+                    <button
+                      type="button"
+                      className="file-remove-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedFile(null);
+                        if (fileInputRef.current) fileInputRef.current.value = "";
+                      }}
+                    >
+                      ✕ Remove
+                    </button>
                   </div>
-                </div>
-              )}
+                ) : (
+                  <div className="dropzone-empty">
+                    <div className="dropzone-icon">☁️</div>
+                    <h4 className="dropzone-heading">Click or drag &amp; drop your resume PDF</h4>
+                    <p className="dropzone-sub">Supports PDF documents (.pdf) up to 10MB</p>
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        fileInputRef.current?.click();
+                      }}
+                    >
+                      Browse PDF 📂
+                    </button>
+                  </div>
+                )}
+              </div>
 
               <div className="resume-modal-footer">
                 <button
@@ -336,7 +274,7 @@ export default function ResumeUploadModal({
                   type="button"
                   className="btn btn-primary"
                   onClick={handleAnalyze}
-                  disabled={activeTab === "file" ? !selectedFile : !resumeText.trim()}
+                  disabled={!selectedFile}
                 >
                   ✨ Extract Skills with Gemini Flash
                 </button>
