@@ -174,9 +174,17 @@ Add the following local-development configuration:
 ```dotenv
 PORT=5000
 MONGODB_URI=mongodb://127.0.0.1:27017/career_skill_analyzer
+JWT_SECRET=career_skill_analyzer_dev_secret_key_2026
+GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
 Save the file. The MongoDB URI points to a local MongoDB server and uses the `career_skill_analyzer` database. MongoDB creates the database when data is first written; it may not appear in Compass until a collection or document exists.
+
+**Environment variables explained:**
+- `PORT`: Port the Express server listens on (`5000`).
+- `MONGODB_URI`: Local MongoDB database URI (`mongodb://127.0.0.1:27017/career_skill_analyzer`).
+- `JWT_SECRET`: Any private secret string you invent (e.g. `career_skill_analyzer_dev_secret_key_2026`). It is used locally by the server to sign and verify user login tokens. You do **not** need to register on any website or find it online.
+- `GEMINI_API_KEY`: Required for the AI Roadmap, AI Resume Parser, and Custom Job Analyzer. You can get a free API key from [Google AI Studio](https://aistudio.google.com/app/apikey).
 
 The backend should load these variables using:
 

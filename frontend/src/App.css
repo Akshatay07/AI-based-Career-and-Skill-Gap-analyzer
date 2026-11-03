@@ -74,43 +74,150 @@
   flex-wrap: wrap;
 }
 
-.status-indicators {
-  display: flex;
+/* Unified Status Check in Header */
+.status-check-wrapper {
+  position: relative;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
 }
 
-.status-pill {
+.status-check-btn {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 5px 12px;
-  font-size: 12px;
-  font-weight: 500;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  font-family: inherit;
   border-radius: var(--radius-full);
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  color: var(--text-secondary);
-  cursor: default;
+  color: var(--text-primary);
+  cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.status-pill.status-online {
+.status-check-btn:hover {
+  background: var(--bg-surface-elevated);
+  border-color: rgba(99, 102, 241, 0.4);
+  transform: translateY(-1px);
+}
+
+.status-check-btn.status-online {
   border-color: var(--success-border);
   color: var(--text-primary);
   background: var(--success-bg);
-  cursor: pointer;
 }
 
-.status-pill.status-offline {
+.status-check-btn.status-offline {
   border-color: var(--error-border);
   color: #fca5a5;
   background: var(--error-bg);
-  cursor: pointer;
 }
 
-.status-pill.status-checking {
+.status-check-btn.status-checking {
   color: var(--text-muted);
+}
+
+/* Status Popover Card */
+.status-popover {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 290px;
+  background: #0f172a;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 0 15px rgba(99, 102, 241, 0.15);
+  padding: 16px;
+  z-index: 1000;
+  backdrop-filter: blur(12px);
+  animation: fadeIn 0.18s ease-out;
+}
+
+.status-popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 8px;
+}
+
+.status-popover-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.3px;
+}
+
+.popover-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.popover-close-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.status-popover-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.status-row-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.status-name {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.status-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.status-badge.badge-online {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.status-badge.badge-offline {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.status-popover-footer .btn-block {
+  width: 100%;
 }
 
 .status-dot {

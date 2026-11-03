@@ -34,18 +34,30 @@ export function clearStoredAuth(): void {
   localStorage.removeItem(USER_KEY);
 }
 
-// Check backend server health
-export async function checkBackendHealth(): Promise<{ isOnline: boolean; message: string }> {
+export interface HealthStatus {
+  isOnline: boolean;
+  dbConnected: boolean;
+  message: string;
+}
+
+// Check backend server and MongoDB health
+export async function checkBackendHealth(): Promise<HealthStatus> {
   try {
     const response = await fetch(`${API_BASE_URL}/health`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
-    return { isOnline: true, message: data.message || "Backend is online" };
+    const isDbConnected = data.database === "Connected" || data.dbState === 1;
+    return {
+      isOnline: true,
+      dbConnected: isDbConnected,
+      message: data.message || "Backend is online",
+    };
   } catch (error) {
     return {
       isOnline: false,
+      dbConnected: false,
       message: error instanceof Error ? error.message : "Unable to reach backend",
     };
   }

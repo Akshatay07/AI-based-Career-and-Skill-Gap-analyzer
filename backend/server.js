@@ -28,9 +28,12 @@ app.get("/", (req, res) => {
 });
 
 app.get("/api/health", (req, res) => {
+  const isDbConnected = mongoose.connection.readyState === 1;
   res.status(200).json({
     success: true,
     message: "Career and Skill Gap Analyzer API is running!",
+    database: isDbConnected ? "Connected" : "Disconnected",
+    dbState: mongoose.connection.readyState,
   });
 });
 

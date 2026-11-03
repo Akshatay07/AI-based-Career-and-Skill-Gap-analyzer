@@ -32,6 +32,8 @@ function App() {
   const [roadmap, setRoadmap] = useState<Roadmap | null>(null);
   const [loadingProfile, setLoadingProfile] = useState<boolean>(false);
   const [backendOnline, setBackendOnline] = useState<boolean | null>(null);
+  const [dbConnected, setDbConnected] = useState<boolean | null>(null);
+  const [isHealthChecking, setIsHealthChecking] = useState<boolean>(false);
 
   // Active Tab state for Dashboard ('overview' | 'gap' | 'roadmap' | 'custom-job' | 'edit')
   const [activeTab, setActiveTab] = useState<"overview" | "gap" | "roadmap" | "custom-job" | "edit">("overview");
@@ -42,8 +44,11 @@ function App() {
 
   // Health check
   const loadHealth = useCallback(async () => {
+    setIsHealthChecking(true);
     const health = await checkBackendHealth();
     setBackendOnline(health.isOnline);
+    setDbConnected(health.dbConnected);
+    setIsHealthChecking(false);
   }, []);
 
   // Fetch benchmark roles from MongoDB
@@ -125,6 +130,8 @@ function App() {
       {/* Top Navigation Bar */}
       <Header
         backendOnline={backendOnline}
+        dbConnected={dbConnected}
+        isHealthChecking={isHealthChecking}
         onRefreshHealth={loadHealth}
         currentUser={currentUser}
         onOpenAuth={handleOpenAuth}
