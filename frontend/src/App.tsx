@@ -37,7 +37,7 @@ function App() {
   const [dbConnected, setDbConnected] = useState<boolean | null>(null);
   const [isHealthChecking, setIsHealthChecking] = useState<boolean>(false);
 
-  // Active Tab state for Dashboard ('overview' | 'gap' | 'roadmap' | 'custom-job' | 'jobs' | 'edit')
+  // Active Tab state for Dashboard
   const [activeTab, setActiveTab] = useState<DashboardTab>("overview");
   const [customJobInitialText, setCustomJobInitialText] = useState<string>("");
 
@@ -54,31 +54,31 @@ function App() {
     setIsHealthChecking(false);
   }, []);
 
-  // Fetch benchmark roles from MongoDB
+  // Fetch benchmark roles
   const loadRoles = useCallback(async () => {
     try {
       const data = await fetchCareerRoles();
       setRoles(data);
     } catch (err) {
-      console.error("Failed to load career roles:", err);
+      console.error("Failed to load benchmark roles:", err);
     }
   }, []);
 
-  // Fetch logged in user's profile and existing AI roadmap
+  // Fetch logged in user's profile and roadmap from MongoDB
   const loadUserData = useCallback(async () => {
-    if (!token) {
-      setMyProfile(null);
-      setRoadmap(null);
-      return;
-    }
+    if (!token) return;
     setLoadingProfile(true);
     try {
-      const profileData = await fetchMyProfile(token);
-      setMyProfile(profileData);
+      const profile = await fetchMyProfile(token);
+      setMyProfile(profile);
 
-      // Fetch saved AI roadmap if available
-      const roadmapData = await fetchMyRoadmap(token);
-      setRoadmap(roadmapData);
+      // Also attempt to load saved roadmap if exists
+      try {
+        const rmap = await fetchMyRoadmap(token);
+        setRoadmap(rmap);
+      } catch {
+        // Silently ignore if roadmap has not been generated yet
+      }
     } catch (err) {
       console.error("Failed to load user data:", err);
     } finally {
