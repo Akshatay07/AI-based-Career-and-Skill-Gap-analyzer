@@ -4,8 +4,8 @@ import type { UserProfile } from "../../types/profile";
 interface DashboardHeaderProps {
   user: AuthUser;
   profile: UserProfile | null;
-  activeTab: "overview" | "gap" | "roadmap" | "custom-job" | "edit";
-  onTabChange: (tab: "overview" | "gap" | "roadmap" | "custom-job" | "edit") => void;
+  activeTab: "overview" | "gap" | "roadmap" | "custom-job" | "jobs" | "edit";
+  onTabChange: (tab: "overview" | "gap" | "roadmap" | "custom-job" | "jobs" | "edit") => void;
 }
 
 export default function DashboardHeader({
@@ -132,6 +132,16 @@ export default function DashboardHeader({
         >
           <span className="tab-icon">📋</span>
           <span>Analyze Custom Job</span>
+        </button>
+
+        <button
+          type="button"
+          className={`nav-tab-item ${activeTab === "jobs" ? "active" : ""}`}
+          onClick={() => onTabChange("jobs")}
+        >
+          <span className="tab-icon">💼</span>
+          <span>Live Opportunities</span>
+          <span className="tab-pill live-feed-pill">Live</span>
         </button>
 
         <button

@@ -144,3 +144,4 @@ frontend/
 │   └── types/
 │       └── job.ts                    # TypeScript definitions for live jobs
 ```
+

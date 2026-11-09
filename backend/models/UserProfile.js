@@ -39,6 +39,21 @@ const userProfileSchema = new mongoose.Schema(
       institution: { type: String, trim: true, default: "" },
       graduationYear: { type: Number },
     },
+    savedJobs: [
+      {
+        id: { type: String, required: true },
+        title: { type: String, required: true },
+        company: { type: String, required: true },
+        location: { type: String, default: "Remote" },
+        isRemote: { type: Boolean, default: false },
+        applyUrl: { type: String, required: true },
+        linkedinSearchUrl: { type: String },
+        tags: { type: [String], default: [] },
+        descriptionSnippet: { type: String, default: "" },
+        source: { type: String, default: "API" },
+        savedAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   {
     timestamps: true,

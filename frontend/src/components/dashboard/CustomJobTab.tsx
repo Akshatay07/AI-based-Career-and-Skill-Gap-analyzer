@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { UserProfile } from "../../types/profile";
 import type { RoleAnalysisResult } from "../../types/role";
 import { analyzeCustomJobWithAi } from "../../services/api";
@@ -9,6 +9,7 @@ interface CustomJobTabProps {
   onUpdateTargetRole: (newRole: string) => void;
   onGoToRoadmap: () => void;
   onGoToEdit: () => void;
+  initialJobText?: string;
 }
 
 const SAMPLE_JOB_POSTINGS = [
@@ -84,12 +85,19 @@ export default function CustomJobTab({
   profile,
   onUpdateTargetRole,
   onGoToRoadmap,
+  initialJobText,
 }: CustomJobTabProps) {
-  const [jobText, setJobText] = useState("");
+  const [jobText, setJobText] = useState(initialJobText || "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [analysisResult, setAnalysisResult] = useState<RoleAnalysisResult | null>(null);
   const [savedSuccessMsg, setSavedSuccessMsg] = useState("");
+
+  useEffect(() => {
+    if (initialJobText) {
+      setJobText(initialJobText);
+    }
+  }, [initialJobText]);
 
   const handleAnalyze = async () => {
     if (!token) {

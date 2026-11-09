@@ -8,6 +8,7 @@ import authRoutes from "./routes/authRoutes.js";
 import roleRoutes from "./routes/roleRoutes.js";
 import roadmapRoutes from "./routes/roadmapRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
+import jobRoutes from "./routes/jobRoutes.js";
 import { seedCareerRolesIfEmpty } from "./data/seedDatabase.js";
 
 dotenv.config();
@@ -42,6 +43,7 @@ app.use("/api/profiles", profileRoutes);
 app.use("/api/roles", roleRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/ai/roadmap", roadmapRoutes);
+app.use("/api/jobs", jobRoutes);
 
 async function startServer() {
   try {

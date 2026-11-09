@@ -8,6 +8,7 @@ import EditProfileView from "./components/dashboard/EditProfileView";
 import SkillGapTab from "./components/dashboard/SkillGapTab";
 import AiRoadmapTab from "./components/dashboard/AiRoadmapTab";
 import CustomJobTab from "./components/dashboard/CustomJobTab";
+import JobOpportunitiesTab from "./components/dashboard/JobOpportunitiesTab";
 import {
   checkBackendHealth,
   getStoredToken,
@@ -22,6 +23,7 @@ import type { UserProfile } from "./types/profile";
 import type { AuthUser } from "./types/auth";
 import type { CareerRole } from "./types/role";
 import type { Roadmap } from "./types/roadmap";
+import type { JobOpportunity } from "./types/job";
 import "./App.css";
 
 function App() {
@@ -35,8 +37,11 @@ function App() {
   const [dbConnected, setDbConnected] = useState<boolean | null>(null);
   const [isHealthChecking, setIsHealthChecking] = useState<boolean>(false);
 
-  // Active Tab state for Dashboard ('overview' | 'gap' | 'roadmap' | 'custom-job' | 'edit')
-  const [activeTab, setActiveTab] = useState<"overview" | "gap" | "roadmap" | "custom-job" | "edit">("overview");
+  // Active Tab state for Dashboard ('overview' | 'gap' | 'roadmap' | 'custom-job' | 'jobs' | 'edit')
+  const [activeTab, setActiveTab] = useState<
+    "overview" | "gap" | "roadmap" | "custom-job" | "jobs" | "edit"
+  >("overview");
+  const [customJobInitialText, setCustomJobInitialText] = useState<string>("");
 
   // Auth Modal State
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
@@ -125,6 +130,22 @@ function App() {
     }
   };
 
+  // Launch AI skill gap test directly from a Live Job Opportunity
+  const handleTestJobWithAi = (job: JobOpportunity) => {
+    const text = `Position: ${job.title}
+Company: ${job.company}
+Location: ${job.location} ${job.isRemote ? "(Remote)" : ""}
+
+Key Required & Desired Skills:
+${(job.tags || []).join(", ")}
+
+About the Role & Responsibilities:
+${job.description || job.descriptionSnippet}
+`;
+    setCustomJobInitialText(text);
+    setActiveTab("custom-job");
+  };
+
   return (
     <div className="app-layout">
       {/* Top Navigation Bar */}
@@ -184,8 +205,16 @@ function App() {
                 <CustomJobTab
                   token={token}
                   profile={myProfile}
+                  initialJobText={customJobInitialText}
                   onUpdateTargetRole={handleUpdateTargetRole}
                   onGoToRoadmap={() => setActiveTab("roadmap")}
+                  onGoToEdit={() => setActiveTab("edit")}
+                />
+              ) : activeTab === "jobs" ? (
+                <JobOpportunitiesTab
+                  token={token}
+                  profile={myProfile}
+                  onTestWithAi={handleTestJobWithAi}
                   onGoToEdit={() => setActiveTab("edit")}
                 />
               ) : (

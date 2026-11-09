@@ -2,6 +2,7 @@ import type { UserProfile, CreateProfileInput, ParsedResumeData } from "../types
 import type { AuthUser, AuthResponse } from "../types/auth";
 import type { CareerRole, RoleAnalysisResult } from "../types/role";
 import type { Roadmap } from "../types/roadmap";
+import type { JobOpportunity, SavedJob, JobFilterParams } from "../types/job";
 
 const API_BASE_URL = "http://localhost:5000/api";
 
@@ -280,4 +281,93 @@ export async function analyzeCustomJobWithAi(
   }
 
   return result.data;
+}
+
+// Fetch live job opportunities from public APIs with candidate skill scoring
+export async function fetchLiveJobs(
+  params?: JobFilterParams,
+  token?: string | null
+): Promise<JobOpportunity[]> {
+  const queryParams = new URLSearchParams();
+  if (params?.query) queryParams.set("query", params.query);
+  if (params?.location) queryParams.set("location", params.location);
+  if (params?.remoteOnly) queryParams.set("remoteOnly", "true");
+  if (params?.skills && params.skills.length > 0) {
+    queryParams.set("skills", params.skills.join(","));
+  }
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  const url = `${API_BASE_URL}/jobs${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+  const response = await fetch(url, { headers });
+
+  const result = await response.json();
+  if (!response.ok || !result.success) {
+    throw new Error(result.message || "Failed to load live job postings");
+  }
+
+  return result.jobs || [];
+}
+
+// Fetch saved/bookmarked jobs for the logged-in candidate
+export async function fetchSavedJobs(token: string): Promise<SavedJob[]> {
+  const response = await fetch(`${API_BASE_URL}/jobs/saved`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const result = await response.json();
+  if (!response.ok || !result.success) {
+    throw new Error(result.message || "Failed to fetch saved jobs");
+  }
+
+  return result.savedJobs || [];
+}
+
+// Save/bookmark a job posting
+export async function saveJobBookmark(
+  token: string,
+  job: JobOpportunity
+): Promise<SavedJob[]> {
+  const response = await fetch(`${API_BASE_URL}/jobs/save`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ job }),
+  });
+
+  const result = await response.json();
+  if (!response.ok || !result.success) {
+    throw new Error(result.message || "Failed to bookmark job");
+  }
+
+  return result.savedJobs || [];
+}
+
+// Remove a bookmarked job
+export async function removeJobBookmark(
+  token: string,
+  jobId: string
+): Promise<SavedJob[]> {
+  const response = await fetch(`${API_BASE_URL}/jobs/saved/${encodeURIComponent(jobId)}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const result = await response.json();
+  if (!response.ok || !result.success) {
+    throw new Error(result.message || "Failed to remove job bookmark");
+  }
+
+  return result.savedJobs || [];
 }
