@@ -118,3 +118,4 @@ Unlike generic AI chat responses that disappear on page refresh, roadmaps are **
    - The UI computes completed tasks against total tasks:
      $$\text{Progress \%} = \frac{\text{Completed Action Items}}{\text{Total Action Items}} \times 100$$
    - Displays real-time visual progress as the candidate works through their curriculum.
+

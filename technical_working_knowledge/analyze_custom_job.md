@@ -143,3 +143,4 @@ $$\text{Readiness Score} = \text{round}\left( 0.75 \times \frac{|\text{Matched C
 Once the custom job analysis completes, the UI presents two primary actions:
 1. **"Set as My Target Role"**: Updates the candidate's active `userprofiles.targetRole` in MongoDB so their entire dashboard is tailored to this new opportunity.
 2. **"Generate AI Roadmap for This Job"**: Passes the custom job's missing skills directly into the Gemini Roadmap generator, creating a tailored 12-week study plan specifically designed to qualify the candidate for this exact posting.
+

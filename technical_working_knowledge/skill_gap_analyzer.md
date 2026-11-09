@@ -112,3 +112,4 @@ The UI presents distinct visual sections:
 
 ### 5.3. One-Click AI Roadmap Generation
 When a candidate reviews their missing skills, clicking **"Generate AI Roadmap"** transitions them to the AI Roadmap tab and pre-populates their missing skills into the Google Gemini curriculum generator.
+
