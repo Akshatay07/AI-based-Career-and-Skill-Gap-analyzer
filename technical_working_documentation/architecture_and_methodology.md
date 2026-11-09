@@ -289,3 +289,4 @@ flowchart TD
 | **Route Protection** | Express middleware extracts Bearer token, verifies signature, injects `req.user`. | Unauthenticated clients are blocked from profile, roadmap, and bookmark APIs. |
 | **Network Failover** | 10-minute in-memory cache + 6 curated benchmark partner jobs. | Guarantees live feed is never blank even during external API downtime or rate-limits. |
 | **CORS & Payload Security** | Explicit CORS whitelist; Express JSON body parser capped at 15MB. | Prevents Cross-Origin Exploits and protects against Denial-of-Service buffer overloads. |
+
