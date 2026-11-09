@@ -1,11 +1,19 @@
 import type { AuthUser } from "../../types/auth";
 import type { UserProfile } from "../../types/profile";
 
+export type DashboardTab =
+  | "overview"
+  | "gap"
+  | "roadmap"
+  | "custom-job"
+  | "jobs"
+  | "edit";
+
 interface DashboardHeaderProps {
   user: AuthUser;
   profile: UserProfile | null;
-  activeTab: "overview" | "gap" | "roadmap" | "custom-job" | "jobs" | "edit";
-  onTabChange: (tab: "overview" | "gap" | "roadmap" | "custom-job" | "jobs" | "edit") => void;
+  activeTab: DashboardTab;
+  onTabChange: (tab: DashboardTab) => void;
 }
 
 export default function DashboardHeader({

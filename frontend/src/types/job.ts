@@ -39,3 +39,4 @@ export interface JobFilterParams {
   remoteOnly?: boolean;
   skills?: string[];
 }
+

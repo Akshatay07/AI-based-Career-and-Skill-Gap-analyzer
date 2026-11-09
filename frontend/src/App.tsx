@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import Header from "./components/Header";
 import LandingHero from "./components/LandingHero";
 import AuthModal from "./components/AuthModal";
-import DashboardHeader from "./components/dashboard/DashboardHeader";
+import DashboardHeader, { type DashboardTab } from "./components/dashboard/DashboardHeader";
 import DashboardOverview from "./components/dashboard/DashboardOverview";
 import EditProfileView from "./components/dashboard/EditProfileView";
 import SkillGapTab from "./components/dashboard/SkillGapTab";
@@ -38,9 +38,7 @@ function App() {
   const [isHealthChecking, setIsHealthChecking] = useState<boolean>(false);
 
   // Active Tab state for Dashboard ('overview' | 'gap' | 'roadmap' | 'custom-job' | 'jobs' | 'edit')
-  const [activeTab, setActiveTab] = useState<
-    "overview" | "gap" | "roadmap" | "custom-job" | "jobs" | "edit"
-  >("overview");
+  const [activeTab, setActiveTab] = useState<DashboardTab>("overview");
   const [customJobInitialText, setCustomJobInitialText] = useState<string>("");
 
   // Auth Modal State
