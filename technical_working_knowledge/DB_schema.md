@@ -222,3 +222,4 @@ erDiagram
    - Prevents duplicate benchmark role entries and enables rapid lookup by title.
 4. **`roadmaps.user` (Single Field Index)**:
    - Instant retrieval of the candidate's active learning curriculum.
+
