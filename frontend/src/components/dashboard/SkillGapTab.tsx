@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import type { UserProfile } from "../../types/profile";
 import type { CareerRole, RoleAnalysisResult } from "../../types/role";
 import { analyzeSkillsAgainstRole } from "../../services/api";
@@ -19,7 +19,10 @@ export default function SkillGapTab({
   onUpdateTargetRole,
 }: SkillGapTabProps) {
   const targetRole = profile?.targetRole;
-  const userSkills = profile?.currentSkills || [];
+  const userSkills = useMemo(
+    () => profile?.currentSkills || [],
+    [profile?.currentSkills]
+  );
 
   // Comparison role state (defaults to user's saved target role, but user can simulate others)
   const [activeComparisonRole, setActiveComparisonRole] = useState<string>(targetRole || "");

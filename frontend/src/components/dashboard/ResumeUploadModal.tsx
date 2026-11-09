@@ -383,7 +383,11 @@ export default function ResumeUploadModal({
                     <select
                       className="form-control editor-input"
                       value={editableExpLevel}
-                      onChange={(e) => setEditableExpLevel(e.target.value as any)}
+                      onChange={(e) =>
+                        setEditableExpLevel(
+                          e.target.value as UserProfile["experienceLevel"]
+                        )
+                      }
                     >
                       <option value="Fresher/Student">Fresher / Student</option>
                       <option value="Entry Level">Entry Level (0-2 Yrs)</option>
