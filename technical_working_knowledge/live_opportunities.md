@@ -1,28 +1,13 @@
-# Technical Working Knowledge & Architecture Guide
-
-Welcome to the internal technical architecture documentation for the **AI-Based Career and Skill Gap Analyzer**. This file records the architectural designs, data pipelines, technical tools, and database strategies for each feature in the application.
+# Technical Architecture: Real-Time Live Job Opportunities & Direct Application Matcher
 
 ---
 
-## Table of Contents
-1. [Feature 1: Real-Time Live Job Opportunities & Direct Application Matcher](#feature-1-real-time-live-job-opportunities--direct-application-matcher)
-   - [Overview & Value Proposition](#overview--value-proposition)
-   - [Technology Tools & Justification](#technology-tools--justification)
-   - [Architecture & Data Pipeline Diagram](#architecture--data-pipeline-diagram)
-   - [Step-by-Step Data Processing Lifecycle](#step-by-step-data-processing-lifecycle)
-   - [Database (MongoDB) Storage Strategy](#database-mongodb-storage-strategy)
-   - [Key Frontend & Backend Touchpoints](#key-frontend--backend-touchpoints)
-
----
-
-## Feature 1: Real-Time Live Job Opportunities & Direct Application Matcher
-
-### Overview & Value Proposition
+## 1. Overview & Value Proposition
 This feature enables candidates to transition directly from identifying their skill gaps to finding and applying for real-world hiring opportunities. Rather than presenting generic search links or static job placeholders, the system dynamically fetches active tech postings, computes a live skill compatibility score against the candidate's MongoDB profile, and provides direct links to submit job applications.
 
 ---
 
-### Technology Tools & Justification
+## 2. Technology Tools & Justification
 
 | Component | Tool / Technology | Technical Rationale |
 | :--- | :--- | :--- |
@@ -34,7 +19,7 @@ This feature enables candidates to transition directly from identifying their sk
 
 ---
 
-### Architecture & Data Pipeline Diagram
+## 3. Architecture & Data Pipeline Diagram
 
 ```
                                ┌────────────────────────────────────────────────┐
@@ -81,7 +66,7 @@ This feature enables candidates to transition directly from identifying their sk
 
 ---
 
-### Step-by-Step Data Processing Lifecycle
+## 4. Step-by-Step Data Processing Lifecycle
 
 1. **Trigger & Query Formation**:
    - When the user opens the "Job Opportunities" tab, the client automatically pre-fills the query with the user's active `targetRole` (e.g. `Full Stack Developer` or `Cybersecurity Analyst`) and experience level.
@@ -125,14 +110,14 @@ This feature enables candidates to transition directly from identifying their sk
 
 ---
 
-### Database (MongoDB) Storage Strategy
+## 5. Database (MongoDB) Storage Strategy
 
-#### Why We Do NOT Permanently Store All Search Results in MongoDB:
+### Why We Do NOT Permanently Store All Search Results in MongoDB:
 - **Ephemeral Nature of Jobs**: Job openings are short-lived (companies typically close postings within 14–30 days).
 - **Preventing Database Bloat**: Persisting every searched job into MongoDB would quickly bloat the database with thousands of expired postings that candidates can no longer apply to.
 - **Guaranteed Freshness**: Querying live on-demand ensures candidates are always reviewing active listings.
 
-#### What IS Stored in MongoDB:
+### What IS Stored in MongoDB:
 1. **Short-Term Server Cache (In-Memory / TTL)**:
    - Recent search query results are cached for 5 to 10 minutes. If the candidate switches tabs and returns, the results load instantaneously without redundant external network requests.
 2. **User Bookmarks ("Saved Jobs")**:
@@ -141,7 +126,7 @@ This feature enables candidates to transition directly from identifying their sk
 
 ---
 
-### Key Frontend & Backend Touchpoints
+## 6. Key Frontend & Backend Touchpoints
 
 ```text
 backend/
