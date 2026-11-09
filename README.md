@@ -189,7 +189,7 @@ Save the file. The MongoDB URI points to a local MongoDB server and uses the `ca
 The backend should load these variables using:
 
 ```javascript
-import dotenv from "dotenv";
+import dotenv from "dotenv"; 
 
 dotenv.config();
 ```
