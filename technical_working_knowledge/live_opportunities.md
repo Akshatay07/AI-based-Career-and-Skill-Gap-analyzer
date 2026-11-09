@@ -14,7 +14,7 @@ This feature enables candidates to transition directly from identifying their sk
 | **Live Job Aggregator** | **Arbeitnow & Remotive Public Tech Jobs API** (REST JSON) | **100% Free, Public & Open**. Requires zero third-party billing, credit card setup, or proprietary API key management. Allows anyone who downloads the repository or ZIP file to run the feature immediately out-of-the-box. |
 | **Backend API Layer** | Node.js, Express (`jobRoutes.js`, `jobService.js`) | Acts as a secure intermediary proxy. Fetches external postings, normalizes heterogeneous data schemas, filters out expired postings, and calculates skill match percentages before delivering clean JSON to the client. |
 | **AI Compatibility Matcher** | In-Memory Weighted Matcher + Google Gemini Flash | Performs set-intersection and semantic alignment between the required skills in the job description and the candidate's active `currentSkills` arsenal from MongoDB. |
-| **Frontend UI** | React + TypeScript (`JobOpportunitiesTab.tsx`) | Presents interactive, glassmorphic job cards with role tags, company badges, match readiness bars, direct application buttons, and 1-click links to search on LinkedIn. |
+| **Frontend UI** | React + TypeScript (`JobOpportunitiesTab.tsx`) | Presents interactive, glassmorphic job cards with role tags, company badges, match readiness bars, direct application buttons, and 1-click test with AI Analyzer. |
 | **Database** | MongoDB & Mongoose | Stores persistent candidate profiles and user-saved bookmarks (Saved Jobs) while keeping dynamic search results ephemeral to prevent database bloat. |
 
 ---

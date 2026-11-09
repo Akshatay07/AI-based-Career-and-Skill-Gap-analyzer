@@ -168,10 +168,10 @@ export default function JobOpportunitiesTab({
             <span className="live-badge-text">Real-Time Job Aggregator</span>
             <span className="live-badge-source">Arbeitnow &amp; Remotive APIs</span>
           </div>
-          <h2 className="live-jobs-heading">Live Career Opportunities &amp; LinkedIn Feeds</h2>
+          <h2 className="live-jobs-heading">Live Career Opportunities &amp; Direct Apply Feed</h2>
           <p className="live-jobs-subheading">
-            Discover real-time verified job openings with direct application links, 1-click LinkedIn deep searches,
-            and automated compatibility scoring against your profile skills.
+            Discover real-time verified job openings with direct application links and automated AI skill
+            compatibility assessment against your profile.
           </p>
         </div>
 
@@ -419,23 +419,14 @@ export default function JobOpportunitiesTab({
                         🚀 Apply Now
                       </a>
 
-                      <a
-                        href={job.linkedinSearchUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn btn-sm btn-secondary linkedin-search-btn"
-                        title="Search recruiter posts and connections on LinkedIn"
-                      >
-                        <span className="linkedin-icon">in</span> LinkedIn Search
-                      </a>
-
                       <button
                         type="button"
-                        className="btn btn-sm btn-outline test-ai-btn"
-                        title="Evaluate this job posting with Gemini AI skill assessment"
+                        className="btn btn-sm test-ai-btn-prominent"
+                        title="Evaluate this job posting with Gemini AI recruiter skill gap assessment"
                         onClick={() => onTestWithAi(job)}
                       >
-                        ⚡ Test with AI
+                        <span className="test-ai-bolt">⚡</span>
+                        <span>Test with AI Analyzer</span>
                       </button>
                     </div>
                   </div>
@@ -515,23 +506,10 @@ export default function JobOpportunitiesTab({
                       🚀 Apply Now
                     </a>
 
-                    <a
-                      href={
-                        saved.linkedinSearchUrl ||
-                        `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(
-                          `${saved.title} ${saved.company}`
-                        )}`
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-sm btn-secondary linkedin-search-btn"
-                    >
-                      <span className="linkedin-icon">in</span> LinkedIn Search
-                    </a>
-
                     <button
                       type="button"
-                      className="btn btn-sm btn-outline test-ai-btn"
+                      className="btn btn-sm test-ai-btn-prominent"
+                      title="Evaluate this job posting with Gemini AI recruiter skill gap assessment"
                       onClick={() =>
                         onTestWithAi({
                           id: saved.id,
@@ -550,7 +528,8 @@ export default function JobOpportunitiesTab({
                         })
                       }
                     >
-                      ⚡ Test with AI
+                      <span className="test-ai-bolt">⚡</span>
+                      <span>Test with AI Analyzer</span>
                     </button>
                   </div>
                 </div>

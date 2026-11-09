@@ -4299,11 +4299,10 @@ select.form-control {
 .job-card-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 10px;
   margin-top: auto;
-  padding-top: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .apply-now-btn {
@@ -4314,46 +4313,52 @@ select.form-control {
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  min-width: 105px;
+  padding: 10px 14px;
+  font-size: 13px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  color: #c7d2fe;
+  transition: all 0.25s ease;
 }
 
-.linkedin-search-btn {
-  text-decoration: none;
+.apply-now-btn:hover {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: #818cf8;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.test-ai-btn-prominent {
+  flex: 1.25;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  background: rgba(10, 102, 194, 0.15);
-  border: 1px solid rgba(10, 102, 194, 0.45);
-  color: #70b5f9;
-  font-weight: 600;
+  gap: 7px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
-.linkedin-search-btn:hover {
-  background: rgba(10, 102, 194, 0.3);
-  border-color: #0a66c2;
+.test-ai-btn-prominent:hover {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #c026d3 100%);
+  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.55);
+  transform: translateY(-2px);
   color: #ffffff;
 }
 
-.linkedin-icon {
-  background: #0a66c2;
-  color: #ffffff;
-  font-size: 10.5px;
-  font-weight: 900;
-  padding: 1px 4px;
-  border-radius: 2px;
-  line-height: 1;
-}
-
-.test-ai-btn {
-  color: #c7d2fe;
-  border-color: rgba(99, 102, 241, 0.35);
-}
-
-.test-ai-btn:hover {
-  background: rgba(99, 102, 241, 0.15);
-  border-color: #818cf8;
-  color: #ffffff;
+.test-ai-bolt {
+  font-size: 14px;
+  animation: pulse 1.5s infinite;
 }
 
 /* Empty / Loading States */
