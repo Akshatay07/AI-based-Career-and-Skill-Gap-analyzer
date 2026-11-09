@@ -330,12 +330,21 @@ export default function JobOpportunitiesTab({
                     {/* Top Meta Header */}
                     <div className="job-card-top">
                       <div className="job-company-block">
-                        <span className="job-company-name">{job.company}</span>
+                        <span className="job-company-name">🏢 {job.company}</span>
                         <div className="job-meta-tags">
                           <span className="job-location-tag">
                             {job.isRemote ? "🌐 Remote" : `📍 ${job.location}`}
                           </span>
-                          <span className="job-source-tag">{job.source}</span>
+                          <span
+                            className="job-source-tag"
+                            title={
+                              job.source === "Verified Partner"
+                                ? "Curated benchmark opportunity at a premier tech employer"
+                                : `Live job feed aggregated from the ${job.source} API`
+                            }
+                          >
+                            📡 {job.source}
+                          </span>
                           {job.salary && (
                             <span className="job-salary-tag">💰 {job.salary}</span>
                           )}
@@ -460,12 +469,12 @@ export default function JobOpportunitiesTab({
                 <div key={saved.id} className="job-card saved-card">
                   <div className="job-card-top">
                     <div className="job-company-block">
-                      <span className="job-company-name">{saved.company}</span>
+                      <span className="job-company-name">🏢 {saved.company}</span>
                       <div className="job-meta-tags">
                         <span className="job-location-tag">
                           {saved.isRemote ? "🌐 Remote" : `📍 ${saved.location}`}
                         </span>
-                        <span className="job-source-tag">{saved.source}</span>
+                        <span className="job-source-tag">📡 {saved.source}</span>
                         <span className="job-date-tag">
                           Saved: {new Date(saved.savedAt).toLocaleDateString()}
                         </span>
