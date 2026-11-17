@@ -522,7 +522,6 @@ export default function JobOpportunitiesTab({
                           descriptionSnippet: saved.descriptionSnippet,
                           description: saved.descriptionSnippet,
                           applyUrl: saved.applyUrl,
-                          linkedinSearchUrl: saved.linkedinSearchUrl || "",
                           postedAt: saved.savedAt,
                           source: saved.source,
                         })

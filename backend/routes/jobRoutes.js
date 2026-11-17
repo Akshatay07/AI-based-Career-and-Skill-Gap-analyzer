@@ -141,11 +141,6 @@ router.post("/save", protect, async (req, res) => {
       location: job.location || "Remote",
       isRemote: Boolean(job.isRemote),
       applyUrl: job.applyUrl,
-      linkedinSearchUrl:
-        job.linkedinSearchUrl ||
-        `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(
-          `${job.title} ${job.company}`
-        )}`,
       tags: Array.isArray(job.tags) ? job.tags : [],
       descriptionSnippet: job.descriptionSnippet || "",
       source: job.source || "API",

@@ -1,4 +1,4 @@
-# Technical Architecture: Real-Time Live Job Opportunities & Direct Application Matcher
+﻿# Technical Architecture: Real-Time Live Job Opportunities & Direct Application Matcher
 
 ---
 
@@ -50,7 +50,7 @@ This feature enables candidates to transition directly from identifying their sk
                                │  • Strips HTML and normalizes schema           │
                                │  • Extracts required technologies & tags       │
                                │  • Computes % skill match against profile      │
-                               │  • Injects direct application & LinkedIn links │
+                               │  • Injects direct application URLs           │
                                └───────────────────────┬────────────────────────┘
                                                        │
                                                        │ 5. Returns standardized, scored job cards
@@ -90,7 +90,6 @@ This feature enables candidates to transition directly from identifying their sk
        tags: string[];
        descriptionSnippet: string;
        applyUrl: string;
-       linkedinSearchUrl: string;
        postedAt: string;
        matchScore?: number;
        matchedSkills?: string[];
@@ -105,7 +104,6 @@ This feature enables candidates to transition directly from identifying their sk
 5. **Direct Application & 1-Click Exploration**:
    - Each rendered card provides:
      - **Direct Apply Button**: Opens the company's application form or portal directly.
-     - **LinkedIn Deep-Link**: Opens LinkedIn's search engine pre-filtered for that exact role and company.
      - **Analyze with Gemini**: Injects the job description straight into our Custom Job Analyzer to view detailed core vs. bonus requirement breakdowns.
 
 ---

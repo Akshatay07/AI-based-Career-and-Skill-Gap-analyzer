@@ -10,7 +10,6 @@ export interface JobOpportunity {
   descriptionSnippet: string;
   description: string;
   applyUrl: string;
-  linkedinSearchUrl: string;
   postedAt: string;
   source: string;
   salary?: string | null;
@@ -26,7 +25,6 @@ export interface SavedJob {
   location: string;
   isRemote: boolean;
   applyUrl: string;
-  linkedinSearchUrl?: string;
   tags: string[];
   descriptionSnippet: string;
   source: string;

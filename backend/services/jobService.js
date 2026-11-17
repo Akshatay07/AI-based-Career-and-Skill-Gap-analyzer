@@ -6,7 +6,6 @@
  *
  * Features:
  * - Clean HTML entity decoding and tag stripping
- * - Accurate 1-click LinkedIn deep search URL generation
  * - 10-minute in-memory caching to prevent external API rate-limiting
  * - Curated benchmark developer opportunities at real premier employers (Vercel, Stripe, Datadog, etc.)
  * - Automatic candidate skill compatibility scoring
@@ -24,48 +23,6 @@ const COMMON_TECH_SKILLS = [
   "PyTorch", "TensorFlow", "Pandas", "NumPy", "Scikit-Learn", "DevOps", "Microservices"
 ];
 
-/**
- * Generate a clean, accurate LinkedIn job search deep-link
- * Strips out European legal gender disclaimers like (m/f/d), (m/w/d), special characters,
- * and company suffixes (GmbH, Inc, LLC) that break LinkedIn's exact keyword search.
- */
-function buildLinkedInSearchUrl(title, company, location = "") {
-  // 1. Clean the title: remove German legal gender qualifiers, parenthesis, special chars
-  let cleanTitle = String(title || "")
-    .replace(/\s*\((m|f|d|w|x|\/|\*|\+|\s|all\s*genders)+\)/gi, "")
-    .replace(/\s*-\s*(m|f|d|w|x|\/|\*|\+|\s|all\s*genders)+$/gi, "")
-    .replace(/\*/g, "")
-    .replace(/[()&]/g, " ")
-    .replace(/[,\-_/]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-
-  // 2. Clean company name: remove legal suffixes like GmbH, LLC, Inc., Ltd.
-  let cleanCompany = String(company || "")
-    .replace(/\b(gmbh|inc\.?|llc|ltd\.?|ag|corp\.?|co\.?|se)\b/gi, "")
-    .replace(/[,\-_]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-
-  // 3. Clean location (e.g. Remote or city)
-  let cleanLocation = "";
-  if (location) {
-    if (location.toLowerCase().includes("remote")) {
-      cleanLocation = "Remote";
-    } else {
-      cleanLocation = location.split("/")[0].split(",")[0].trim();
-    }
-  }
-
-  const queryParams = new URLSearchParams();
-  queryParams.set("keywords", `${cleanTitle} ${cleanCompany}`.trim());
-  if (cleanLocation) {
-    queryParams.set("location", cleanLocation);
-  }
-
-  return `https://www.linkedin.com/jobs/search/?${queryParams.toString()}`;
-}
-
 // Curated verified benchmark tech jobs at real premier employers to guarantee high-quality developer opportunities
 const FEATURED_TECH_JOBS = [
   {
@@ -80,7 +37,6 @@ const FEATURED_TECH_JOBS = [
     descriptionSnippet: "Build high-speed edge infrastructure, developer workflow tools, and responsive web applications with Next.js, React, and TypeScript.",
     description: "Vercel is seeking an innovative Full Stack Engineer to contribute to our mission-critical platform. Responsibilities include building responsive UI components in React and Next.js, architecting robust microservices in Node.js, and scaling global edge infrastructure.",
     applyUrl: "https://vercel.com/careers",
-    linkedinSearchUrl: buildLinkedInSearchUrl("Full Stack Engineer", "Vercel", "Remote"),
     postedAt: new Date(Date.now() - 3600000 * 2).toISOString(),
     source: "Verified Partner",
     salary: "$110,000 - $150,000",
@@ -97,7 +53,6 @@ const FEATURED_TECH_JOBS = [
     descriptionSnippet: "Join India's leading fintech infrastructure engineering team building high-performance, accessible payment checkout experiences with React and TypeScript.",
     description: "Razorpay creates enterprise-grade financial software. We are looking for a Frontend Developer with solid expertise in modern React patterns, responsive UI design, TypeScript, and state management to build intuitive merchant portals.",
     applyUrl: "https://razorpay.com/jobs",
-    linkedinSearchUrl: buildLinkedInSearchUrl("Frontend Developer", "Razorpay", "Bengaluru"),
     postedAt: new Date(Date.now() - 3600000 * 6).toISOString(),
     source: "Verified Partner",
     salary: "₹18,00,000 - ₹28,00,000",
@@ -114,7 +69,6 @@ const FEATURED_TECH_JOBS = [
     descriptionSnippet: "Architect generative AI solutions, fine-tune open-source foundation models, and build low-latency inference APIs with Python and PyTorch.",
     description: "Hugging Face is hiring an AI/ML Engineer to train, evaluate, and open-source models, datasets, and AI agents. You will work on NLP pipelines, transformers, vector search, and GPU cluster deployments.",
     applyUrl: "https://huggingface.co/jobs",
-    linkedinSearchUrl: buildLinkedInSearchUrl("Machine Learning Engineer", "Hugging Face", "Remote"),
     postedAt: new Date(Date.now() - 3600000 * 10).toISOString(),
     source: "Verified Partner",
     salary: "$130,000 - $175,000",
@@ -131,7 +85,6 @@ const FEATURED_TECH_JOBS = [
     descriptionSnippet: "Build high-throughput payment APIs, optimize distributed databases, and maintain containerized backend microservices handling millions of transactions.",
     description: "Stripe is seeking an experienced Backend Engineer to lead financial infrastructure architecture. Key duties: designing secure microservices in Node.js, implementing caching with Redis, query optimization on PostgreSQL, and CI/CD automation.",
     applyUrl: "https://stripe.com/jobs",
-    linkedinSearchUrl: buildLinkedInSearchUrl("Backend Engineer", "Stripe", "Remote"),
     postedAt: new Date(Date.now() - 3600000 * 14).toISOString(),
     source: "Verified Partner",
     salary: "$120,000 - $160,000",
@@ -148,7 +101,6 @@ const FEATURED_TECH_JOBS = [
     descriptionSnippet: "Automate multi-cloud infrastructure, orchestrate Kubernetes clusters, and scale telemetry collection pipelines across global regions.",
     description: "Datadog empowers developers with observability and monitoring tools. You will write Terraform scripts, manage multi-region AWS/Kubernetes infrastructure, streamline GitHub Actions workflows, and monitor distributed system reliability.",
     applyUrl: "https://www.datadoghq.com/careers",
-    linkedinSearchUrl: buildLinkedInSearchUrl("DevOps Engineer", "Datadog", "Remote"),
     postedAt: new Date(Date.now() - 3600000 * 20).toISOString(),
     source: "Verified Partner",
     salary: "$115,000 - $155,000",
@@ -165,7 +117,6 @@ const FEATURED_TECH_JOBS = [
     descriptionSnippet: "Transform massive cloud data warehouse analytics into executive dashboards, automate ETL pipelines, and uncover platform usage trends.",
     description: "Snowflake is looking for a Data Analyst to partner with product and marketing teams. Must be proficient in advanced SQL querying, Python data analysis with Pandas, and designing interactive Tableau or Power BI reports.",
     applyUrl: "https://careers.snowflake.com",
-    linkedinSearchUrl: buildLinkedInSearchUrl("Data Analyst", "Snowflake", "Remote"),
     postedAt: new Date(Date.now() - 3600000 * 26).toISOString(),
     source: "Verified Partner",
     salary: "$95,000 - $130,000",
@@ -280,7 +231,6 @@ async function fetchArbeitnowJobs() {
       const company = item.company_name || "Technology Company";
       const location = item.location || (item.remote ? "Remote" : "Europe / Hybrid");
       const applyUrl = item.url || "https://www.arbeitnow.com";
-      const linkedinSearchUrl = buildLinkedInSearchUrl(title, company, location);
 
       return {
         id: `an-${item.slug || idx}`,
@@ -294,7 +244,6 @@ async function fetchArbeitnowJobs() {
         descriptionSnippet: snippet,
         description: cleanDesc,
         applyUrl,
-        linkedinSearchUrl,
         postedAt: item.created_at ? new Date(item.created_at * 1000).toISOString() : new Date().toISOString(),
         source: "Arbeitnow",
         salary: null,
@@ -342,7 +291,6 @@ async function fetchRemotiveJobs() {
       const company = item.company_name || "Remote Team";
       const location = item.candidate_required_location || "Remote - Global";
       const applyUrl = item.url || "https://remotive.com";
-      const linkedinSearchUrl = buildLinkedInSearchUrl(title, company, location);
 
       return {
         id: `rem-${item.id || idx}`,
@@ -356,7 +304,6 @@ async function fetchRemotiveJobs() {
         descriptionSnippet: snippet,
         description: cleanDesc,
         applyUrl,
-        linkedinSearchUrl,
         postedAt: item.publication_date || new Date().toISOString(),
         source: "Remotive",
         salary: item.salary || null,

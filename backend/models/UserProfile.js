@@ -47,7 +47,6 @@ const userProfileSchema = new mongoose.Schema(
         location: { type: String, default: "Remote" },
         isRemote: { type: Boolean, default: false },
         applyUrl: { type: String, required: true },
-        linkedinSearchUrl: { type: String },
         tags: { type: [String], default: [] },
         descriptionSnippet: { type: String, default: "" },
         source: { type: String, default: "API" },
