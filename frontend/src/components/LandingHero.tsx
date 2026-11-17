@@ -6,7 +6,6 @@ export default function LandingHero({ onOpenAuth }: LandingHeroProps) {
   return (
     <div className="landing-hero-container">
       <div className="landing-hero-card">
-        <div className="landing-badge">Final Year Project &bull; AI Career Advisory</div>
         <h1 className="landing-headline">
           Bridge the Gap Between <span className="gradient-text">Your Current Skills</span> and Your{" "}
           <span className="gradient-text">Dream Role</span>

@@ -244,8 +244,7 @@ ${job.description || job.descriptionSnippet}
       {/* Footer */}
       <footer className="app-footer">
         <p>
-          AI-Based Career and Skill Gap Analyzer &bull; Final Year Capstone Project &bull; Built with
-          React, Node.js, Express &amp; Local MongoDB
+          AI-Based Career and Skill Gap Analyzer &bull; Built with React, Node.js, Express &amp; Local MongoDB
         </p>
       </footer>
     </div>
