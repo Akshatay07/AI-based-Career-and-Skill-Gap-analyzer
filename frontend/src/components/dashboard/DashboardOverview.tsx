@@ -9,7 +9,6 @@ interface DashboardOverviewProps {
 }
 
 export default function DashboardOverview({
-  user,
   profile,
   onGoToEdit,
   onGoToGap,
@@ -182,28 +181,6 @@ export default function DashboardOverview({
             >
               📄 Auto-Fill from Resume (Gemini AI)
             </button>
-          </div>
-        </div>
-
-        {/* Database & Sync Status Card */}
-        <div className="card db-meta-card">
-          <div className="db-meta-header">
-            <span className="status-dot online"></span>
-            <strong>Database Synchronization</strong>
-          </div>
-          <div className="db-meta-list">
-            <div className="db-meta-item">
-              <span>Database</span>
-              <code>career_skill_analyzer</code>
-            </div>
-            <div className="db-meta-item">
-              <span>User ID</span>
-              <code>{user._id}</code>
-            </div>
-            <div className="db-meta-item">
-              <span>Profile Record</span>
-              <code>{profile._id || "Linked"}</code>
-            </div>
           </div>
         </div>
       </div>
